@@ -19,9 +19,14 @@ public class BrandTests {
     void createBrandTest() {
         User user = userRepository.findByEmail("john.doe@example.com");
         Brand brand = new Brand();
-        brand.setName("New House");
+        brand.setName("Nike");
         brand.setUuidUser(user.getUuidUser());
         brandRepository.save(brand);
+
+        Brand brand2 = new Brand();
+        brand2.setName("adidas");
+        brand2.setUuidUser(user.getUuidUser());
+        brandRepository.save(brand2);
     }
 
 }

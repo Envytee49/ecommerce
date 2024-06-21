@@ -14,10 +14,10 @@ import java.time.LocalDateTime;
 @Setter
 public class AbstractEntity {
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    protected LocalDateTime createdDate;
 
     @Column(name = "updated_date")
-    private LocalDateTime updatedDate;
+    protected LocalDateTime updatedDate;
 
     @PrePersist
     public void prePersist() {

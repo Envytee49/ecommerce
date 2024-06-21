@@ -1,5 +1,6 @@
 package org.example.ecommerce.product.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -28,5 +29,24 @@ public class ProductCreateRequest {
 
     private String description;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishedDate;
+
+    @NotBlank
+    private String uuidBrand;
+
+    @Override
+    public String toString() {
+        return "ProductCreateRequest{" +
+                "title='" + title + '\'' +
+                ", metaTitle='" + metaTitle + '\'' +
+                ", summary='" + summary + '\'' +
+                ", type=" + type +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", description='" + description + '\'' +
+                ", publishedDate=" + publishedDate +
+                ", uuidBrand='" + uuidBrand + '\'' +
+                '}';
+    }
 }

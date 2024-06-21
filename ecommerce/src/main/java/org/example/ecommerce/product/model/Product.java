@@ -66,5 +66,21 @@ public class Product extends AbstractEntity {
     @Size(max = 40)
     @Column(name = "uuid_brand")
     private String uuidBrand;
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "uuidProduct='" + uuidProduct + '\'' +
+                ", title='" + title + '\'' +
+                ", metaTitle='" + metaTitle + '\'' +
+                ", summary='" + summary + '\'' +
+                ", type=" + type +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", publishedDate=" + publishedDate +
+                ", description='" + description + '\'' +
+                ", uuidBrand='" + uuidBrand + '\'' +
+                '}';
+    }
 }
 
