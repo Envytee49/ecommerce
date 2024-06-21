@@ -1,11 +1,14 @@
 package org.example.ecommerce.product.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.ecommerce.brand.exception.BrandNotFoundException;
 import org.example.ecommerce.product.dto.request.ProductCreateRequest;
+import org.example.ecommerce.product.dto.request.ProductUpdateRequest;
 import org.example.ecommerce.product.dto.response.ProductDetailResponse;
 import org.example.ecommerce.product.dto.response.ProductsResponse;
 import org.example.ecommerce.product.model.Product;
 import org.example.ecommerce.product.service.ProductService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,9 +23,9 @@ public class ProductController {
         return productService.getAllProducts(page, size);
     }
 
-    @PutMapping
-    Product updateProduct(@RequestBody ProductCreateRequest productCreateRequest) {
-        return productService.updateProduct(productCreateRequest);
+    @PatchMapping("/{uuidProduct}")
+    Product updateProduct(@PathVariable String uuidProduct, @RequestBody ProductUpdateRequest productUpdateRequest) {
+        return productService.updateProduct(productUpdateRequest, uuidProduct);
     }
 
     @DeleteMapping("/{uuidProduct}")
@@ -31,8 +34,14 @@ public class ProductController {
     }
 
     @PostMapping
-    Product addProduct(@RequestBody ProductCreateRequest productCreateRequest) {
-        return productService.addProduct(productCreateRequest);
+    ResponseEntity<?> addProduct(@RequestBody ProductCreateRequest productCreateRequest) {
+        try {
+            Product product = productService.addProduct(productCreateRequest);
+            return ResponseEntity.ok(product);
+        } catch (BrandNotFoundException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
+
     }
 
     @GetMapping("/{uuidProduct}")

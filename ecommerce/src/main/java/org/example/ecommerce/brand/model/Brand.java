@@ -1,4 +1,4 @@
-package org.example.ecommerce.user.model;
+package org.example.ecommerce.brand.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -2,8 +2,8 @@ package org.example.ecommerce;
 
 import org.example.ecommerce.product.model.Product;
 import org.example.ecommerce.product.repository.ProductRepository;
-import org.example.ecommerce.user.model.Brand;
-import org.example.ecommerce.user.repository.BrandRepository;
+import org.example.ecommerce.brand.model.Brand;
+import org.example.ecommerce.brand.repository.BrandRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

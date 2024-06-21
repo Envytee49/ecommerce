@@ -35,18 +35,4 @@ public class ProductCreateRequest {
     @NotBlank
     private String uuidBrand;
 
-    @Override
-    public String toString() {
-        return "ProductCreateRequest{" +
-                "title='" + title + '\'' +
-                ", metaTitle='" + metaTitle + '\'' +
-                ", summary='" + summary + '\'' +
-                ", type=" + type +
-                ", price=" + price +
-                ", quantity=" + quantity +
-                ", description='" + description + '\'' +
-                ", publishedDate=" + publishedDate +
-                ", uuidBrand='" + uuidBrand + '\'' +
-                '}';
-    }
 }
