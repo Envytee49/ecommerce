@@ -22,9 +22,8 @@ public class ProductCategory {
     @Id
     @NotNull
     @Size(max = 40)
-    @Builder.Default
     @Column(name = "uuid_product")
-    private String uuidProduct = Utils.getUuid();;
+    private String uuidProduct;
 
     @Id
     @NotNull
@@ -32,4 +31,5 @@ public class ProductCategory {
     @Column(name = "uuid_category")
     private String uuidCategory;
 }
+
 

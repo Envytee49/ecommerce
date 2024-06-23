@@ -32,6 +32,7 @@ public class ProductDetailResponse {
 
     private Map<String, String> attributes;
 
+
     public static ProductDetailResponse from(Product product, String brand, Map<String, String> attributes) {
         return ProductDetailResponse.builder()
                 .uuidProduct(product.getUuidProduct())

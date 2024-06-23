@@ -1,10 +1,7 @@
 package org.example.ecommerce.product.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -15,6 +12,7 @@ import org.example.ecommerce.model.AbstractEntity;
 import org.example.ecommerce.util.Utils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -66,21 +64,5 @@ public class Product extends AbstractEntity {
     @Size(max = 40)
     @Column(name = "uuid_brand")
     private String uuidBrand;
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "uuidProduct='" + uuidProduct + '\'' +
-                ", title='" + title + '\'' +
-                ", metaTitle='" + metaTitle + '\'' +
-                ", summary='" + summary + '\'' +
-                ", type=" + type +
-                ", price=" + price +
-                ", quantity=" + quantity +
-                ", publishedDate=" + publishedDate +
-                ", description='" + description + '\'' +
-                ", uuidBrand='" + uuidBrand + '\'' +
-                '}';
-    }
 }
 
