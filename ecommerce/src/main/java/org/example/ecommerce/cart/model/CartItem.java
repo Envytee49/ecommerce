@@ -8,8 +8,8 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.example.ecommerce.model.AbstractEntity;
-import org.example.ecommerce.util.Utils;
+import org.example.ecommerce.common.model.AbstractEntity;
+import org.example.ecommerce.common.util.Utils;
 
 @Getter
 @Setter

@@ -1,6 +1,5 @@
 package org.example.ecommerce.product.dto.response;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.ecommerce.product.model.Product;

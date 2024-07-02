@@ -1,14 +1,15 @@
 package org.example.ecommerce.product.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.ecommerce.brand.exception.BrandNotFoundException;
-import org.example.ecommerce.product.dto.request.ProductCreateRequest;
-import org.example.ecommerce.product.dto.request.ProductUpdateRequest;
+import org.example.ecommerce.exception.AppException;
+import org.example.ecommerce.exception.ErrorCode;
+import org.example.ecommerce.product.dto.request.*;
 import org.example.ecommerce.product.dto.response.ProductDetailResponse;
 import org.example.ecommerce.product.dto.response.ProductResponse;
 import org.example.ecommerce.product.dto.response.ProductsResponse;
-import org.example.ecommerce.product.exception.ProductNotFoundException;
+import org.example.ecommerce.product.model.Category;
 import org.example.ecommerce.product.model.Product;
+import org.example.ecommerce.product.repository.CategoryRepository;
 import org.example.ecommerce.product.repository.ProductRepository;
 import org.example.ecommerce.product.service.AttributeService;
 import org.example.ecommerce.product.service.ProductService;
@@ -27,42 +28,45 @@ import java.util.Map;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final BrandRepository brandRepository;
+    private final CategoryRepository categoryRepository;
     private final AttributeService attributeService;
+
     @Override
-    public Product addProduct(ProductCreateRequest productCreateRequest) {
-        Brand brand = brandRepository.findById(productCreateRequest.getUuidBrand()).orElse(null);
-        if(brand == null) {
-            throw new BrandNotFoundException("Brand not found");
+    public void addProduct(CreateProductRequest createProductRequest) {
+
+        Brand brand = brandRepository.findById(createProductRequest.getUuidBrand()).orElse(null);
+        if (brand == null) {
+            throw new AppException(ErrorCode.NO_RESOURCE_FOUND);
         }
 
-        Product product = Product.builder()
-                .publishedDate(productCreateRequest.getPublishedDate())
-                .price(productCreateRequest.getPrice())
-                .title(productCreateRequest.getTitle())
-                .description(productCreateRequest.getDescription())
-                .metaTitle(productCreateRequest.getMetaTitle())
-                .quantity(productCreateRequest.getQuantity())
-                .summary(productCreateRequest.getSummary())
-                .type(productCreateRequest.getType())
-                .uuidBrand(productCreateRequest.getUuidBrand())
+        Product savedProduct = Product.builder()
+                .publishedDate(createProductRequest.getPublishedDate())
+                .price(createProductRequest.getPrice())
+                .title(createProductRequest.getTitle())
+                .description(createProductRequest.getDescription())
+                .metaTitle(createProductRequest.getMetaTitle())
+                .quantity(createProductRequest.getQuantity())
+                .summary(createProductRequest.getSummary())
+                .type(createProductRequest.getType())
+                .uuidBrand(createProductRequest.getUuidBrand())
                 .build();
-        return productRepository.save(product);
+        productRepository.save(savedProduct);
     }
 
     @Override
-    public Product updateProduct(ProductUpdateRequest productUpdateRequest, String uuidProduct) {
-        Product product = productRepository.findById(uuidProduct)
-                .orElseThrow(() -> new ProductNotFoundException("product not found"));
-        if(productUpdateRequest.getPrice() != null)
-            product.setPrice(productUpdateRequest.getPrice());
+    public void updateProduct(UpdateProductRequest updateProductRequest) {
+        Product product = productRepository.findById(updateProductRequest.getUuidProduct())
+                .orElseThrow(() -> new AppException(ErrorCode.NO_RESOURCE_FOUND));
+        if (updateProductRequest.getPrice() != null)
+            product.setPrice(updateProductRequest.getPrice());
 
-        if(productUpdateRequest.getQuantity() != null)
-            product.setQuantity(productUpdateRequest.getQuantity());
+        if (updateProductRequest.getQuantity() != null)
+            product.setQuantity(updateProductRequest.getQuantity());
 
-        if(productUpdateRequest.getPublishedDate() != null)
-            product.setPublishedDate(productUpdateRequest.getPublishedDate());
+        if (updateProductRequest.getPublishedDate() != null)
+            product.setPublishedDate(updateProductRequest.getPublishedDate());
 
-        return productRepository.save(product);
+        productRepository.save(product);
     }
 
     @Override
@@ -71,15 +75,18 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductsResponse getAllProducts(int page, int size) {
+    public ProductsResponse getAllProducts(FetchProductsRequest fetchProductsRequest) {
 
+
+        int page = fetchProductsRequest.getPage();
+        int size = fetchProductsRequest.getSize();
         // get all products
         List<Product> products = productRepository.findAll();
 
         // get all products by page and size
         Pageable pageRequest = PageRequest.of(page, size);
         Page<Product> productsByPageSize = productRepository.findAll(pageRequest);
-        System.out.println(productsByPageSize.getSize());
+
         // convert to product response
         List<ProductResponse> productResponse = productsByPageSize
                 .stream()
@@ -96,12 +103,15 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailResponse getProductByUuid(String uuidProduct) {
         Product product = productRepository
                 .findById(uuidProduct)
-                .orElseThrow(() -> new ProductNotFoundException("product not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.NO_RESOURCE_FOUND));
 
         Brand brand = brandRepository.findById(product.getUuidBrand())
-                .orElseThrow(() -> new BrandNotFoundException("brand not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.NO_RESOURCE_FOUND));
 
-        Map<String, String> attributes = attributeService.getAttributes(uuidProduct);
-        return ProductDetailResponse.from(product, brand.getName(), attributes);
+        List<Category> categories = categoryRepository.findByUuidProduct(uuidProduct);
+
+        Map<String, String> attributes = attributeService.findByUuidProduct(uuidProduct);
+
+        return ProductDetailResponse.from(product, brand.getName(), categories, attributes);
     }
 }

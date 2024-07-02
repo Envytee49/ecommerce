@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.example.ecommerce.model.AbstractEntity;
+import org.example.ecommerce.common.model.AbstractEntity;
 
 @Table(name = "attribute")
 @Getter

@@ -5,5 +5,5 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 @Service
 public interface AttributeService {
-    Map<String, String> getAttributes(String uuidProduct);
+    Map<String, String> findByUuidProduct(String uuidProduct);
 }

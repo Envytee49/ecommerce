@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.example.ecommerce.util.Utils;
+import org.example.ecommerce.common.util.Utils;
 
 import java.time.LocalDateTime;
 

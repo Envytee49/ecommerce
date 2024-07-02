@@ -19,7 +19,7 @@ public class AttributeServiceImpl implements AttributeService {
     private final ProductAttributeRepository productAttributeRepository;
 
     @Override
-    public Map<String, String> getAttributes(String uuidProduct) {
+    public Map<String, String> findByUuidProduct(String uuidProduct) {
         List<ProductAttribute> productAttribute = productAttributeRepository
                 .findByUuidProduct(uuidProduct);
 

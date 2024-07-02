@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.ecommerce.util.Utils;
+import org.example.ecommerce.common.util.Utils;
 
 @Data
 @Builder

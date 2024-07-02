@@ -2,14 +2,17 @@ package org.example.ecommerce.product.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.example.ecommerce.common.ApiResponse;
+import org.example.ecommerce.product.model.Category;
 import org.example.ecommerce.product.model.Product;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Builder
 @Getter
-public class ProductDetailResponse {
+public class ProductDetailResponse extends ApiResponse {
     private String uuidProduct;
 
     private String title;
@@ -32,8 +35,12 @@ public class ProductDetailResponse {
 
     private Map<String, String> attributes;
 
+    private List<Category> categories;
 
-    public static ProductDetailResponse from(Product product, String brand, Map<String, String> attributes) {
+    public static ProductDetailResponse from(Product product,
+                                             String brand,
+                                             List<Category> categories,
+                                             Map<String, String> attributes) {
         return ProductDetailResponse.builder()
                 .uuidProduct(product.getUuidProduct())
                 .publishedDate(product.getPublishedDate())
@@ -46,6 +53,7 @@ public class ProductDetailResponse {
                 .type(product.getType())
                 .brand(brand)
                 .attributes(attributes)
+                .categories(categories)
                 .build();
     }
 }

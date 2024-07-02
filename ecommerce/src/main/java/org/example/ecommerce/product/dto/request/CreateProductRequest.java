@@ -5,13 +5,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class ProductCreateRequest {
-    @NotBlank
+public class CreateProductRequest {
+    @NotBlank(message = "title must not be blank")
     private String title;
 
     private String metaTitle;
@@ -30,9 +31,10 @@ public class ProductCreateRequest {
     private String description;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @NotNull
     private LocalDateTime publishedDate;
 
-    @NotBlank
+    @NotBlank(message = "uuidBrand must not be blank")
     private String uuidBrand;
 
 }

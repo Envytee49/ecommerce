@@ -1,53 +1,56 @@
 package org.example.ecommerce.product.controller;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
-import org.example.ecommerce.brand.exception.BrandNotFoundException;
-import org.example.ecommerce.product.dto.request.ProductCreateRequest;
-import org.example.ecommerce.product.dto.request.ProductUpdateRequest;
-import org.example.ecommerce.product.dto.response.ProductDetailResponse;
-import org.example.ecommerce.product.dto.response.ProductsResponse;
-import org.example.ecommerce.product.model.Product;
-import org.example.ecommerce.product.service.ProductService;
-import org.springframework.http.ResponseEntity;
+import org.example.ecommerce.common.ApiResponse;
+import org.example.ecommerce.common.ResponseData;
+import org.example.ecommerce.product.api.*;
+import org.example.ecommerce.product.dto.request.*;
+import org.example.ecommerce.product.dto.response.*;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/product")
+@RequestMapping("/products")
 @RequiredArgsConstructor
+//@Validated
 public class ProductController {
-    private final ProductService productService;
+    private final CreateProductApi createProductApi;
+    private final UpdateProductApi updateProductApi;
+    private final DeleteProductApi deleteProductApi;
+    private final FetchProductsApi fetchProductsApi;
+    private final FetchProductDetailApi fetchProductDetailApi;
 
     @GetMapping
-    ProductsResponse getAllProducts(@RequestParam(required = true) int page,
-                                    @RequestParam(required = true) int size) {
-        return productService.getAllProducts(page, size);
+    ResponseData<ProductsResponse> getAllProducts(
+            @Min(0) @RequestParam int page,
+            @Min(20) @RequestParam int size) {
+        FetchProductsRequest fetchProductsRequest = new FetchProductsRequest(page, size);
+        return fetchProductsApi.execute(fetchProductsRequest);
     }
 
+
     @PatchMapping("/{uuidProduct}")
-    Product updateProduct(@PathVariable String uuidProduct, @RequestBody ProductUpdateRequest productUpdateRequest) {
-        return productService.updateProduct(productUpdateRequest, uuidProduct);
+    ApiResponse updateProduct(@PathVariable String uuidProduct,
+                              @Valid @RequestBody UpdateProductRequest updateProductRequest) {
+        updateProductRequest.setUuidProduct(uuidProduct);
+        return updateProductApi.execute(updateProductRequest);
     }
 
     @DeleteMapping("/{uuidProduct}")
-    void deleteProduct(@PathVariable String uuidProduct) {
-        productService.deleteProduct(uuidProduct);
+    ApiResponse deleteProduct(@PathVariable String uuidProduct) {
+        return deleteProductApi.execute(uuidProduct);
     }
 
     @PostMapping
-    ResponseEntity<?> addProduct(@RequestBody ProductCreateRequest productCreateRequest) {
-        try {
-            Product product = productService.addProduct(productCreateRequest);
-            return ResponseEntity.ok(product);
-        } catch (BrandNotFoundException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+    ApiResponse addProduct(@Valid @RequestBody CreateProductRequest createProductRequest) {
+        return createProductApi.execute(createProductRequest);
 
     }
 
     @GetMapping("/{uuidProduct}")
-    ProductDetailResponse getProductDetail(@PathVariable String uuidProduct) {
-        return productService.getProductByUuid(uuidProduct);
+    ResponseData<ProductDetailResponse> getProductDetail(@PathVariable String uuidProduct) {
+        return fetchProductDetailApi.execute(uuidProduct);
     }
-
-
 }

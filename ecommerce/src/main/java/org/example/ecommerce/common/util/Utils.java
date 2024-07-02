@@ -1,4 +1,4 @@
-package org.example.ecommerce.util;
+package org.example.ecommerce.common.util;
 
 import java.util.UUID;
 

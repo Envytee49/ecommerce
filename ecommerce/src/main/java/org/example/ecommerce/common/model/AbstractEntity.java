@@ -1,4 +1,4 @@
-package org.example.ecommerce.model;
+package org.example.ecommerce.common.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
