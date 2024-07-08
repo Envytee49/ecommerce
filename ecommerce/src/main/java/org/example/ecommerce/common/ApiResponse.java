@@ -2,18 +2,23 @@ package org.example.ecommerce.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.bind.annotation.ResponseBody;
 
-@ResponseBody
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ApiResponse {
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ApiResponse<T> {
 
-    protected int code;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    protected String message;
+    private Integer errorCode; // defined error code
+    @Builder.Default
+    private Integer statusCode = 200; // http status code
 
+    private String message; // message
+
+    private T data;
 }

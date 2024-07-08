@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Builder
 @Getter
-public class ProductDetailResponse extends ApiResponse {
+public class ProductDetailResponse {
     private String uuidProduct;
 
     private String title;

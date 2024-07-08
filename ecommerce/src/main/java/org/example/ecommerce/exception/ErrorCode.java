@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
+    UNKNOWN(1, "Unknown Error"),
 
     INVALID_PARAMETER_DATA(998, null),
 
@@ -13,9 +14,14 @@ public enum ErrorCode {
 
     INVALID_PARAMETER_TYPE(1000, "Parameter type is not suitable."),
 
-    NO_RESOURCE_FOUND(1001, "Not Found"),
+    INVALID_DATA_FORMAT(1001, "Invalid data format."),
 
-    INVALID_DATE_FORMAT(1002, "Invalid date format. Please use yyyy-MM-dd HH:mm:ss");
+    NO_RESOURCE_FOUND(1002, "No resource found."),
+
+    PRODUCT_NOT_FOUND(1003, "Product Not Found"),
+
+    BRAND_NOT_FOUND(1004, "Brand Not Found");
+
 
     private final int code;
 

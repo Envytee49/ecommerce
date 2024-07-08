@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 @Builder
@@ -14,8 +13,6 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 public class UpdateProductRequest {
-    private String uuidProduct;
-
     @Min(value = 0, message = "price should be equal or more than 0")
     private Double price;
 

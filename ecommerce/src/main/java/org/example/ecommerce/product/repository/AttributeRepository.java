@@ -10,10 +10,12 @@ import java.util.List;
 
 @Repository
 public interface AttributeRepository extends JpaRepository<Attribute, String> {
-    @Query(value = "select a from Attribute a \n" +
-            "where a.uuidAttribute in \n" +
-            "(select pa.uuidAttribute \n" +
-            "from ProductAttribute pa\n" +
-            " where pa.uuidProduct = :uuidProduct)")
-    List<Attribute> findByUuidAttribute(@Param("uuidProduct") String uuidProduct);
+    @Query(value = "SELECT pa.value AS value, a.key AS key " +
+            "FROM ProductAttribute pa " +
+            "INNER JOIN Attribute a ON a.uuidAttribute = pa.uuidAttribute " +
+            "WHERE pa.uuidProduct = :uuidProduct")
+    // nested sql jpa
+    // jdbc template
+    // interface
+    List<IAttribute> findByUuidProduct(@Param("uuidProduct") String uuidProduct);
 }
