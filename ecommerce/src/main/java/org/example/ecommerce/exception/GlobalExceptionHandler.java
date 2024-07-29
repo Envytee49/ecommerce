@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.example.ecommerce.common.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -74,10 +75,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleNotReadableException(HttpMessageNotReadableException exception) {
+
         return ApiResponse.builder()
                 .errorCode(ErrorCode.INVALID_DATA_FORMAT.getCode())
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .message(ErrorCode.INVALID_DATA_FORMAT.getMessage())
+                .message(exception.getRootCause() != null ? exception.getRootCause().getMessage() :
+                        ErrorCode.INVALID_DATA_FORMAT.getMessage())
                 .build();
     }
 
@@ -94,10 +97,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiResponse<?> handleUnknownException(Exception exception) {
+        exception.printStackTrace();
         return ApiResponse.builder()
                 .errorCode(ErrorCode.UNKNOWN.getCode())
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(ErrorCode.UNKNOWN.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleBadCredentialsException(BadCredentialsException exception) {
+        return ApiResponse.builder()
+                .errorCode(ErrorCode.BAD_CREDENTIALS.getCode())
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .message(ErrorCode.BAD_CREDENTIALS.getMessage())
                 .build();
     }
 }

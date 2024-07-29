@@ -1,5 +1,6 @@
 package org.example.ecommerce.product.repository;
 
+import org.example.ecommerce.product.dto.response.CategoryResponse;
 import org.example.ecommerce.product.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,10 +11,12 @@ import java.util.List;
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, String> {
-    @Query(value = "select c from Category c " +
-            "where c.uuidCategory in " +
-            "(select pc.uuidCategory " +
-            "from ProductCategory pc " +
-            "where pc.uuidProduct = :uuidProduct)")
-    List<Category> findByUuidProduct(@Param("uuidProduct") String uuidProduct);
+
+    Category findByTitle(String title);
+    @Query(value =
+            "SELECT new org.example.ecommerce.product.dto.response.CategoryResponse(c.uuidCategory, c.title) " +
+                    "FROM Category c INNER JOIN ProductCategory pc ON c.uuidCategory = pc.category.uuidCategory " +
+                    "INNER JOIN Product p ON pc.product.uuidProduct = p.uuidProduct " +
+                    "WHERE p.uuidProduct = :uuidProduct")
+    List<CategoryResponse> findByUuidProduct(@Param("uuidProduct") String uuidProduct);
 }

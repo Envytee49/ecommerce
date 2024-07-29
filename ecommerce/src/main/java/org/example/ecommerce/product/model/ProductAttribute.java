@@ -1,10 +1,7 @@
 package org.example.ecommerce.product.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -22,18 +19,17 @@ import org.example.ecommerce.common.util.Utils;
 public class ProductAttribute {
     @Id
     @NotNull
-    @Size(max = 40)
-    @Builder.Default
-    @Column(name = "uuid_attribute")
-    private String uuidAttribute = Utils.getUuid();;
-
+    @ManyToOne
+    @JoinColumn(name = "uuid_product")
+    private Product product;
+    @Id
     @NotNull
-    @Size(max = 40)
-    @Column(name = "uuid_product")
-    private String uuidProduct;
+    @ManyToOne
+    @JoinColumn(name = "uuid_attribute")
+    private Attribute attribute;
 
     @Size(max = 200)
-    @Column(name = "value")
+    @Column(name = "_value")
     private String value;
 }
 

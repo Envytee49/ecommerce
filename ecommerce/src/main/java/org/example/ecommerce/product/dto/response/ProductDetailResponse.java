@@ -2,8 +2,6 @@ package org.example.ecommerce.product.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.example.ecommerce.common.ApiResponse;
-import org.example.ecommerce.product.model.Category;
 import org.example.ecommerce.product.model.Product;
 
 import java.time.LocalDateTime;
@@ -31,16 +29,14 @@ public class ProductDetailResponse {
 
     private LocalDateTime publishedDate;
 
-    private String brand;
 
     private Map<String, String> attributes;
 
-    private List<Category> categories;
+    private List<CategoryResponse> categories;
 
     public static ProductDetailResponse from(Product product,
-                                             String brand,
-                                             List<Category> categories,
-                                             Map<String, String> attributes) {
+                                             Map<String, String> attributes,
+                                             List<CategoryResponse> categories) {
         return ProductDetailResponse.builder()
                 .uuidProduct(product.getUuidProduct())
                 .publishedDate(product.getPublishedDate())
@@ -51,9 +47,9 @@ public class ProductDetailResponse {
                 .summary(product.getSummary())
                 .description(product.getDescription())
                 .type(product.getType())
-                .brand(brand)
                 .attributes(attributes)
                 .categories(categories)
                 .build();
     }
+
 }

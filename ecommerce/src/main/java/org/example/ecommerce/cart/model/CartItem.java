@@ -1,10 +1,7 @@
 package org.example.ecommerce.cart.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -20,6 +17,8 @@ import org.example.ecommerce.common.util.Utils;
 @Table(name = "cart_item")
 public class CartItem extends AbstractEntity {
     @Id
+    @NotNull
+    @Size(max = 40)
     @Column(name = "uuid_cart_item")
     @Builder.Default
     private String uuidCartItem = Utils.getUuid();
@@ -35,9 +34,14 @@ public class CartItem extends AbstractEntity {
     private String uuidProduct = null;
 
     @Builder.Default
+    @Size(max = 40)
+    @Column(name = "uuid_shop")
+    private String uuidShop = null;
+
+    @Builder.Default
     @NotNull
     @Column(name = "price")
-    private double price = 0;
+    private double unitPrice = 0;
 
     @Builder.Default
     @NotNull

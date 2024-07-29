@@ -7,46 +7,25 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.example.ecommerce.common.util.Utils;
-
-@Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "user_address")
-public class UserAddress {
+public class UserAddress extends AbstractAddress{
     @Id
     @NotNull
     @Size(max = 40)
-    @Builder.Default
-    @Column(name = "uuid_address")
-    private String uuidAddress = Utils.getUuid();
+    @Column(name = "uuid_uaddress")
+    private String uuidUAddress = Utils.getUuid();
 
     @Size(max = 40)
     @Column(name = "uuid_user")
     private String uuidUser;
 
-    @Size(max = 15)
-    @Column(name = "mobile")
-    private String mobile;
-
-    @Size(max = 255)
-    @Column(name = "city")
-    private String city;
-
-    @Size(max = 255)
-    @Column(name = "street")
-    private String street;
-
-    @Size(max = 255)
-    @Column(name = "district")
-    private String district;
-
-    @Column(name = "postal_code")
-    private Integer postalCode;
+    @Size(max = 30)
+    @Column(name = "receiver_name")
+    private String receiverName;
 }

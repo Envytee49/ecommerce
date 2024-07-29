@@ -2,6 +2,8 @@ package org.example.ecommerce.product.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -12,6 +14,7 @@ import org.example.ecommerce.common.model.AbstractEntity;
 import org.example.ecommerce.common.util.Utils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -59,9 +62,19 @@ public class Product extends AbstractEntity {
     @Column(name = "description")
     private String description;
 
-    @NotNull
-    @Size(max = 40)
-    @Column(name = "uuid_brand")
-    private String uuidBrand;
+    @Min(value = 0, message = "discount must be between 0-1")
+    @Max(value = 1, message = "discount must be between 0-1")
+    @Column(name = "discount")
+    private double discount;
+
+    @NotNull(message = "uuidShop should not be null")
+    @Column(name = "uuid_shop")
+    private String uuidShop;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductCategory> categories;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductAttribute> attributes;
 }
 

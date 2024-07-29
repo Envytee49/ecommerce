@@ -1,9 +1,6 @@
 package org.example.ecommerce.product.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -20,15 +17,15 @@ import lombok.NoArgsConstructor;
 public class ProductCategory {
     @Id
     @NotNull
-    @Size(max = 40)
-    @Column(name = "uuid_product")
-    private String uuidProduct;
+    @ManyToOne
+    @JoinColumn(name = "uuid_product")
+    private Product product;
 
     @Id
     @NotNull
-    @Size(max = 40)
-    @Column(name = "uuid_category")
-    private String uuidCategory;
+    @ManyToOne
+    @JoinColumn(name = "uuid_category")
+    private Category category;
 }
 
 

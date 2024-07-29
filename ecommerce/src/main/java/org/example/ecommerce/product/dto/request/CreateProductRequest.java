@@ -34,7 +34,4 @@ public class CreateProductRequest {
     @NotNull
     private LocalDateTime publishedDate;
 
-    @NotBlank(message = "uuidBrand must not be blank")
-    private String uuidBrand;
-
 }
