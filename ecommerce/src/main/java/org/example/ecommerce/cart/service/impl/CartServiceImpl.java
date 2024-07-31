@@ -94,8 +94,4 @@ public class CartServiceImpl implements CartService {
         cartRepository.save(cartItem);
     }
 
-    @Override
-    public List<CartItem> getSelectedCartItems(List<String> uuidCartItems) {
-        return cartRepository.findByUuidCartItemIn(uuidCartItems);
-    }
 }

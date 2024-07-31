@@ -5,17 +5,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 public final class SecurityUtils {
-    public static String getCurrentUserUsername() {
-        return extractPrincipal(getAuthentication()).getUsername();
-    }
+
     public static String getCurrentUserCartUuid() {
-        return extractPrincipal(getAuthentication()).getUserCartUuid();
+        return extractPrincipal(getAuthentication()).getUuidCart();
     }
     public static String getCurrentUserUuid() {
-        return extractPrincipal(getAuthentication()).getUserUuid();
-    }
-    public static SecurityUser getCurrentUser() {
-        return extractPrincipal(getAuthentication());
+        return extractPrincipal(getAuthentication()).getUuidUser();
     }
     private static SecurityUser extractPrincipal(Authentication authentication) {
         if (authentication == null) {

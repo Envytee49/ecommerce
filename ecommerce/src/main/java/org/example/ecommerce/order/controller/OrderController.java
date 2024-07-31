@@ -7,6 +7,7 @@ import org.example.ecommerce.common.controller.AbstractController;
 import org.example.ecommerce.order.dto.request.InvoiceRequest;
 import org.example.ecommerce.order.dto.request.PlaceOrderRequest;
 import org.example.ecommerce.order.dto.response.InvoiceResponse;
+import org.example.ecommerce.order.service.InvoiceService;
 import org.example.ecommerce.order.service.OrderService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -16,15 +17,19 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class OrderController extends AbstractController {
     private final OrderService orderService;
+    private final InvoiceService invoiceService;
     @GetMapping("/invoice")
+    @PreAuthorize("hasRole('USER')")
     public ApiResponse<InvoiceResponse> getInvoice(@Valid @RequestBody InvoiceRequest request) {
-        return this.respond(() -> orderService.getInvoice(request));
+        return this.respond(() -> invoiceService.getInvoice(request));
     }
     @PostMapping("/place-order")
+    @PreAuthorize("hasRole('USER')")
     public ApiResponse<?> placeOrder(@Valid @RequestBody PlaceOrderRequest request) {
         return respond(() -> orderService.placeOrder(request), "Order placed");
     }
     @PostMapping("/cancel/{uuidOrder}")
+    @PreAuthorize("hasRole('USER')")
     public ApiResponse<?> cancelOrder(@PathVariable String uuidOrder) {
         return respond(() -> orderService.cancelOrder(uuidOrder), "Order cancelled");
     }

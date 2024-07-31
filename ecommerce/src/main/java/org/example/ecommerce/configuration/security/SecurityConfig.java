@@ -33,11 +33,9 @@ public class SecurityConfig {
                 request.requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/products/info/**").permitAll()
                         .requestMatchers(HttpMethod.GET,"/vouchers/**").permitAll()
-                        .requestMatchers("/cart/**", "/orders/**", "/users/info/**").hasRole("USER")
+                        .requestMatchers("/cart/**", "/users/info/**").hasRole("USER")
                         .requestMatchers("/products/management/**").hasAnyRole("ADMIN", "SELLER")
                         .requestMatchers("/users/management/**").hasRole("ADMIN")
-                        .requestMatchers("/vouchers/seller/**").hasRole("SELLER")
-                        .requestMatchers("/vouchers/user/**").hasRole("USER")
                         .anyRequest().authenticated();
             })
             .authenticationProvider(authenticationProvider)

@@ -12,6 +12,6 @@ public class InvoiceDetailResponse {
     private List<OrderItemResponse> items;
     private double subTotal;
     private double totalAmount;
-    private double promotion;
+    private double discount;
     private double shipping;
 }

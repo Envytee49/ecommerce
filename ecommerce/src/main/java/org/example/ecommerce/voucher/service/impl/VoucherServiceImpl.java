@@ -1,6 +1,8 @@
 package org.example.ecommerce.voucher.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.ecommerce.cart.model.CartItem;
+import org.example.ecommerce.cart.repository.CartRepository;
 import org.example.ecommerce.common.constants.VoucherType;
 import org.example.ecommerce.configuration.security.SecurityUtils;
 import org.example.ecommerce.exception.AppException;
@@ -34,13 +36,15 @@ public class VoucherServiceImpl implements VoucherService {
     private final ProductVoucherRepository productVoucherRepository;
     private final ShopRepository shopRepository;
     private final VoucherConstraintRepository voucherConstraintRepository;
+    private final CartRepository cartRepository;
 
     // check if voucher is claimed
     // check if current selected cart items is discount by voucher
     // if it is ALL_SHOP then is applicable
     @Override
-    public ShopVoucherResponse getShopVouchers(FetchVoucherRequest fetchVoucherRequest) {
-        String uuidShop = fetchVoucherRequest.getUuidShop();
+    public ShopVoucherResponse getShopVouchers(FetchVoucherRequest request) {
+        String uuidShop = request.getUuidShop();
+        if(!shopRepository.existsById(uuidShop)) throw new AppException(ErrorCode.SHOP_NOT_FOUND);
         String uuidUser = SecurityUtils.getCurrentUserUuid();
         List<VoucherResponse> redeemedVouchers = voucherRepository.findRedeemedVoucher(uuidShop, uuidUser);
 
@@ -52,8 +56,8 @@ public class VoucherServiceImpl implements VoucherService {
                             voucherRepository.findVoucherByUuidShop(uuidShop))
                     .build();
         }
-
-        double subTotal = fetchVoucherRequest.getSubTotal();
+        List<CartItem> cartItems = cartRepository.findAllById(request.getUuidCartItems());
+        double subTotal = computeSubtotal(cartItems);
         // check constraint: subtotal > minspend, check if all_shop or for specific product, expired date
         for (VoucherResponse v : redeemedVouchers) {
             if (checkIsConstraintSatisfied(v, subTotal)) {
@@ -64,7 +68,8 @@ public class VoucherServiceImpl implements VoucherService {
                             productVoucherRepository
                                     .findByUuidVoucher(v.getUuidVoucher()); // how to reduce nums of db call
                     // all the selected products in the cart
-                    List<String> uuidProducts = fetchVoucherRequest.getUuidProducts();
+                    List<String> uuidProducts =
+                            cartItems.stream().map(CartItem::getUuidProduct).toList();
                     boolean isVoucherApplicable = checkIntersection(productVouchers, uuidProducts);
                     v.setApplicable(isVoucherApplicable);
                 }else v.setApplicable(true);
@@ -72,7 +77,7 @@ public class VoucherServiceImpl implements VoucherService {
         }
 
         List<String> uuidRedeemedVouchers =
-                redeemedVouchers.stream().map(voucher -> voucher.getUuidVoucher()).toList();
+                redeemedVouchers.stream().map(VoucherResponse::getUuidVoucher).toList();
         // get the unredeemed vouchers
         List<VoucherResponse> voucherResponses =
                 voucherRepository.findUnredeemedVoucher(uuidRedeemedVouchers, uuidShop);
@@ -81,6 +86,10 @@ public class VoucherServiceImpl implements VoucherService {
         return ShopVoucherResponse.builder()
                 .shopVouchers(voucherResponses)
                 .build();
+    }
+
+    private double computeSubtotal(List<CartItem> cartItems) {
+        return cartItems.stream().mapToDouble(cartItem -> cartItem.getUnitPrice() * cartItem.getQuantity()).sum();
     }
 
     private boolean checkIntersection(List<IProductVoucher> productVouchers, List<String> uuidProducts) {
@@ -164,6 +173,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     @Transactional
+    // locking resource
     public void redeemVoucher(String uuidVoucher) {
         Voucher voucher = voucherRepository.findById(uuidVoucher)
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));

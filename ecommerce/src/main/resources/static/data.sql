@@ -8,9 +8,14 @@ select * from attribute;
 select * from user_address;
 select * from shop_address;
 select * from shop;
-select * from voucher;
-delete from product;
+
+select * from product;
 select * from `order`;
--- delete  from user_address;
--- delete  from shop_address;
-alter table `order` drop column tax;
+select * from voucher_redemption;
+select * from product_voucher;
+select * from voucher;
+-- find vouchers and their constraint for a shop where voucher is claimed by the current user
+
+create table `test` (
+	`value` decimal(10,2)
+)

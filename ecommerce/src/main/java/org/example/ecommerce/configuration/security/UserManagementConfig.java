@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +48,14 @@ public class UserManagementConfig {
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
             List<String> roles = userRoleRepository.findByUuidUser(user.getUuidUser())
                     .stream().map(userRole -> userRole.getRole().name()).toList();
-            return new SecurityUser(user, roles);
+            List<SimpleGrantedAuthority> authorities =
+                    roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
+            return  new SecurityUser(
+                    user.getEmail(),
+                    user.getPassword(),
+                    authorities,
+                    user.getUuidUser(),
+                    user.getUuidCart());
         };
     }
     @Bean

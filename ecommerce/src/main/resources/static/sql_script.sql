@@ -158,14 +158,14 @@ CREATE UNIQUE INDEX `product_title` ON `product` (`title` ASC) VISIBLE;
 -- Table `cart_item`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `cart_item` ;
-
+select * from `order`
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `cart_item` (
 	`uuid_cart_item` VARCHAR(40) NOT NULL,
   `uuid_cart` VARCHAR(40) NOT NULL,
   `uuid_product` VARCHAR(40) NOT NULL,
   `uuid_shop` VARCHAR(40) NOT NULL,
-  `price` DOUBLE NOT NULL DEFAULT '0',
+  `price` DECIMAL(10,2) NOT NULL DEFAULT '0',
   `discount` DOUBLE NOT NULL DEFAULT '0',
   `quantity` SMALLINT NOT NULL DEFAULT '0',
   `active` SMALLINT NOT NULL DEFAULT '0',

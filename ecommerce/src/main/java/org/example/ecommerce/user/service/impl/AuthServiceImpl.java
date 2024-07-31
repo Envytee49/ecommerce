@@ -14,6 +14,8 @@ import org.example.ecommerce.configuration.filter.JwtService;
 import org.example.ecommerce.voucher.repository.UserRoleRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -49,7 +51,17 @@ public class AuthServiceImpl implements AuthService {
 
         List<String> roles = userRoleRepository.findByUuidUser(user.getUuidUser())
                 .stream().map(userRole -> userRole.getRole().name()).toList();
-        SecurityUser securityUser = new SecurityUser(user,roles);
+
+        List<SimpleGrantedAuthority> authorities =
+                roles.stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role)).toList();
+
+        SecurityUser securityUser = new SecurityUser(
+                user.getEmail(),
+                user.getPassword(),
+                authorities,
+                user.getUuidUser(),
+                user.getUuidCart());
+
         String jwt = jwtService.generateToken(securityUser);
 
         JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
@@ -64,5 +76,4 @@ public class AuthServiceImpl implements AuthService {
     public void logOut() {
 
     }
-
 }

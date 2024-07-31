@@ -9,13 +9,13 @@ import lombok.*;
 public class TotalInvoice {
     private double subTotal;
     private double totalAmount;
-    private double promotion;
+    private double discount;
     private double shipping;
 
-    public void updateInvoice(double shipping, double subTotal, double promotion, double totalAmount) {
+    public void updateInvoice(double shipping, double subTotal, double discount, double totalAmount) {
         this.shipping += shipping;
         this.subTotal += subTotal;
-        this.promotion += promotion;
+        this.discount += discount;
         this.totalAmount += totalAmount;
     }
 }

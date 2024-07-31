@@ -1,5 +1,6 @@
 package org.example.ecommerce.product.controller;
 
+import com.nimbusds.jose.JWSHeader;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.common.ApiResponse;
@@ -30,7 +31,7 @@ public class ProductManagementController extends AbstractController {
                 "Product deleted successfully");
     }
 
-    @PostMapping()
+    @PostMapping
     ApiResponse<?> addProduct(@Valid @RequestBody CreateProductRequest createProductRequest) {
         return respond(() -> productManagementService.create(createProductRequest),
                 HttpStatus.CREATED,

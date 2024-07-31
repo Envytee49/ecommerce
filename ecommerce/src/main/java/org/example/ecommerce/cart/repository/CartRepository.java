@@ -14,5 +14,4 @@ public interface CartRepository extends JpaRepository<CartItem, String> {
     Page<CartItem> findByUuidCart(String uuidCart, Pageable pageable);
     void deleteByUuidCart(String uuidCart);
     CartItem findByUuidCartAndUuidProduct(String uuidCart, String uuidProduct);
-    List<CartItem> findByUuidCartItemIn(List<String> uuidCartItems);
 }
