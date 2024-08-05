@@ -7,9 +7,9 @@ import java.util.List;
 @Getter
 @Builder
 public class InvoiceDetailResponse {
-    private String seller;
+    private String shopName;
     private String uuidShop;
-    private List<OrderItemResponse> items;
+    private List<CartItemResponse> items;
     private double subTotal;
     private double totalAmount;
     private double discount;

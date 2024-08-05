@@ -6,7 +6,7 @@ import org.example.ecommerce.cart.model.CartItem;
 
 @Getter
 @Builder
-public class OrderItemResponse {
+public class CartItemResponse {
 
     private String uuidProduct;
 
@@ -20,8 +20,8 @@ public class OrderItemResponse {
 
     private int quantity;
 
-    public static OrderItemResponse from(CartItem cartItem) {
-        return OrderItemResponse.builder()
+    public static CartItemResponse from(CartItem cartItem) {
+        return CartItemResponse.builder()
                 .uuidProduct(cartItem.getUuidProduct())
                 .unitPrice(cartItem.getUnitPrice())
                 .totalPrice(cartItem.getUnitPrice() * cartItem.getQuantity())

@@ -1,5 +1,6 @@
 package org.example.ecommerce.order.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,6 +25,7 @@ public class OrderItem extends AbstractEntity {
     @NotNull
     @Column(name = "uuid_order_item")
     @Builder.Default
+    @JsonIgnore
     private String uuidOrderItem = Utils.getUuid();
 
     @NotNull
@@ -34,6 +36,7 @@ public class OrderItem extends AbstractEntity {
     @NotNull
     @Size(max = 40)
     @Column(name = "uuid_order")
+    @JsonIgnore
     private String uuidOrder;
 
     @NotNull
@@ -49,8 +52,8 @@ public class OrderItem extends AbstractEntity {
     @NotNull
     @Builder.Default
     @Column(name = "quantity")
-    private int quantity = 0;
-
+    private double quantity = 0;
+    @JsonIgnore
     @Column(name = "content")
     private String content;
 }

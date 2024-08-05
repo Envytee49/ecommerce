@@ -1,6 +1,5 @@
 package org.example.ecommerce.configuration.security;
 
-import org.example.ecommerce.user.model.SecurityUser;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;

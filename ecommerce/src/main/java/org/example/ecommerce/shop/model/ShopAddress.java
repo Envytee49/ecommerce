@@ -1,4 +1,4 @@
-package org.example.ecommerce.user.model;
+package org.example.ecommerce.shop.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -6,16 +6,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.ecommerce.common.util.Utils;
+import org.example.ecommerce.user.model.AbstractAddress;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "shop_address")
-public class ShopAddress extends AbstractAddress{
+public class ShopAddress extends AbstractAddress {
     @Id
     @NotNull
     @Size(max = 40)

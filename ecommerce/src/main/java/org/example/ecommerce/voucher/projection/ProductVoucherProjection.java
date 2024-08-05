@@ -1,5 +1,5 @@
 package org.example.ecommerce.voucher.projection;
 
-public interface IProductVoucher {
+public interface ProductVoucherProjection {
     String getUuidProduct();
 }

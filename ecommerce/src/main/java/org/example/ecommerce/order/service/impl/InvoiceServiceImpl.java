@@ -3,15 +3,17 @@ package org.example.ecommerce.order.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.cart.model.CartItem;
 import org.example.ecommerce.cart.repository.CartRepository;
-import org.example.ecommerce.cart.service.CartService;
 import org.example.ecommerce.exception.AppException;
 import org.example.ecommerce.exception.ErrorCode;
 import org.example.ecommerce.order.dto.request.InvoiceRequest;
 import org.example.ecommerce.order.dto.response.*;
+import org.example.ecommerce.order.dto.response.CartItemResponse;
+import org.example.ecommerce.order.dto.response.InvoiceDetailResponse;
+import org.example.ecommerce.order.dto.response.InvoiceResponse;
 import org.example.ecommerce.order.service.InvoiceService;
-import org.example.ecommerce.user.model.Shop;
+import org.example.ecommerce.shop.model.Shop;
 import org.example.ecommerce.user.model.UserAddress;
-import org.example.ecommerce.user.repository.ShopRepository;
+import org.example.ecommerce.shop.repository.ShopRepository;
 import org.example.ecommerce.user.repository.UserAddressRepository;
 import org.example.ecommerce.voucher.model.Voucher;
 import org.example.ecommerce.voucher.repository.VoucherRepository;
@@ -72,8 +74,8 @@ public class InvoiceServiceImpl implements InvoiceService {
             // Cart items logic
             String uuidShop = shop.getUuidShop();
             List<CartItem> cartItemByShop = itemsByShop.get(uuidShop);
-            List<OrderItemResponse> orderItemResponse = cartItemByShop
-                    .stream().map(OrderItemResponse::from).toList();
+            List<CartItemResponse> cartItemResponse = cartItemByShop
+                    .stream().map(CartItemResponse::from).toList();
 
             String seller = shop.getName();
 
@@ -87,8 +89,8 @@ public class InvoiceServiceImpl implements InvoiceService {
                     .discount(discount)
                     .totalAmount(totalAmount)
                     .subTotal(subTotal)
-                    .seller(seller)
-                    .items(orderItemResponse)
+                    .shopName(seller)
+                    .items(cartItemResponse)
                     .uuidShop(uuidShop)
                     .build());
         }
@@ -123,14 +125,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         if (StringUtils.isEmpty(uuidUAddress)) return null;
         UserAddress userAddress = userAddressRepository.findById(uuidUAddress).
                 orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
-        return DeliveryInfo.builder()
-                .mobile(userAddress.getMobile())
-                .receiver(userAddress.getReceiverName())
-                .city(userAddress.getCity())
-                .district(userAddress.getDistrict())
-                .street(userAddress.getStreet())
-                .postalCode(userAddress.getPostalCode())
-                .build();
+        return DeliveryInfo.from(userAddress);
     }
 
     private double computeSubTotal(List<CartItem> cartItems) {

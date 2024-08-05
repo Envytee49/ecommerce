@@ -29,7 +29,6 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
-    private final AuthService authService;
     @Override
     public PageDtoOut<CartItemResponse> getCart(PageDtoIn pageDtoIn) {
         Pageable page = PageRequest.of(pageDtoIn.getPage()-1, pageDtoIn.getSize());

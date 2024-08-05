@@ -3,10 +3,16 @@ package org.example.ecommerce;
 import org.example.ecommerce.common.constants.DiscountType;
 import org.example.ecommerce.common.constants.Role;
 import org.example.ecommerce.common.constants.VoucherType;
+import org.example.ecommerce.order.model.CancelledOrderReason;
+import org.example.ecommerce.order.repository.CancelledOrderReasonRepository;
 import org.example.ecommerce.product.model.*;
 import org.example.ecommerce.product.repository.AttributeRepository;
 import org.example.ecommerce.product.repository.CategoryRepository;
 import org.example.ecommerce.product.repository.ProductRepository;
+import org.example.ecommerce.shop.model.Shop;
+import org.example.ecommerce.shop.model.ShopAddress;
+import org.example.ecommerce.shop.repository.ShopAddressRepository;
+import org.example.ecommerce.shop.repository.ShopRepository;
 import org.example.ecommerce.user.model.*;
 import org.example.ecommerce.user.repository.*;
 import org.example.ecommerce.voucher.model.ProductVoucher;
@@ -51,6 +57,8 @@ class EcommerceApplicationTests {
     private ProductVoucherRepository productVoucherRepository;
     @Autowired
     private UserRoleRepository userRoleRepository;
+    @Autowired
+    private CancelledOrderReasonRepository cancelledOrderReasonRepository;
 
     @Test
     public void addUser() {
@@ -414,4 +422,33 @@ class EcommerceApplicationTests {
         shopAddressRepository.saveAll(List.of(address1, address2));
     }
 
+    @Test
+    void addReason() {
+        cancelledOrderReasonRepository.saveAll(
+                List.of(
+                        CancelledOrderReason.builder()
+                                .reason("Need to change delivery address")
+                                .build(),
+                        CancelledOrderReason.builder()
+                                .reason("Need to input/change voucher code")
+                                .build(),
+                        CancelledOrderReason.builder()
+                                .reason("Need to modify order (size, color, quantity, etc.)")
+                                .build(),
+                        CancelledOrderReason.builder()
+                                .reason("Payment procedure to troublesome")
+                                .build(),
+                        CancelledOrderReason.builder()
+                                .reason("Found cheaper elsewhere")
+                                .build(),
+                        CancelledOrderReason.builder()
+                                .reason("Don't want to buy anymore")
+                                .build(),
+                        CancelledOrderReason.builder()
+                                .reason("Others")
+                                .build()
+
+                )
+        );
+    }
 }

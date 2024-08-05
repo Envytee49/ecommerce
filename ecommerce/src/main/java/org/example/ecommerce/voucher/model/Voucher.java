@@ -1,6 +1,7 @@
 package org.example.ecommerce.voucher.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,6 +45,11 @@ public class Voucher extends AbstractEntity {
     @Column(name = "description")
     @Size(max = 200)
     private String description;
+    @Column(name = "is_visible")
+    @NotNull
+    @Builder.Default
+    private boolean isVisible = true;
     @Column(name = "uuid_shop")
-    private String uuidShop;
+    @Builder.Default
+    private String uuidShop = null;
 }

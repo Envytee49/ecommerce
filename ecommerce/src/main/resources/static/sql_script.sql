@@ -158,7 +158,6 @@ CREATE UNIQUE INDEX `product_title` ON `product` (`title` ASC) VISIBLE;
 -- Table `cart_item`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `cart_item` ;
-select * from `order`
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `cart_item` (
 	`uuid_cart_item` VARCHAR(40) NOT NULL,
@@ -214,12 +213,12 @@ SHOW WARNINGS;
 -- Table `order`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `order` ;
-
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `order` (
   `uuid_order` VARCHAR(40) NOT NULL,
-  `user_id` VARCHAR(40) NULL DEFAULT NULL,
-  `status` SMALLINT NOT NULL DEFAULT '0',
+  `uuid_user` VARCHAR(40) NULL DEFAULT NULL,
+  `uuid_user` VARCHAR(40) NULL DEFAULT NULL,
+  `status` enum('ORDER_PLACED', 'ORDER_APPROVED', 'ORDER_DECLINED', 'ORDER_SHIPPED', 'DELIVERED', 'CANCELLED') NOT NULL, -- enum or varchar here
   `subtotal` DOUBLE NOT NULL DEFAULT '0',
   `shipping` DOUBLE NOT NULL DEFAULT '0',
   `total` DOUBLE NOT NULL DEFAULT '0',
@@ -242,8 +241,37 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 SHOW WARNINGS;
 CREATE INDEX `user_id` ON `order` (`user_id` ASC) VISIBLE;
+SHOW WARNINGS;
+CREATE INDEX `user_shop` ON `order` (`user_shop` ASC) VISIBLE;
+-- -----------------------------------------------------
+-- Table `cancel_order_reason`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `cancel_order_reason` ;
 
 SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `cancel_order_reason` (
+	`uuid_reason` VARCHAR(40) NOT NULL PRIMARY KEY,
+    `reason` VARCHAR(100) NOT NULL
+);
+-- -----------------------------------------------------
+-- Table `cancelled_order`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `cancelled_order` ;
+
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `cancelled_order` (
+	`uuid_order` VARCHAR(40) NOT NULL PRIMARY KEY, 
+    `uuid_reason`  VARCHAR(40) NOT NULL,
+    `status` enum('APPROVED', 'DECLINED', 'PENDING') NOT NULL,
+    `requested_at` TIMESTAMP NOT NULL,
+    CONSTRAINT `cancelled_order_1`
+    FOREIGN KEY (`uuid_order`)
+    REFERENCES `order` (`uuid_order`),
+    CONSTRAINT `cancelled_order_2`
+    FOREIGN KEY (`uuid_reason`)
+    REFERENCES `cancel_order_reason` (`uuid_reason`)
+);
+
 -- -----------------------------------------------------
 -- Table `voucher`
 -- -----------------------------------------------------
@@ -258,6 +286,7 @@ CREATE TABLE IF NOT EXISTS `voucher` (
     `discount` DOUBLE NULL DEFAULT NULL,
     `discount_type` ENUM('PERCENTAGE', 'FIXED') NOT NULL,
     `description` VARCHAR(200) NOT NULL,
+    `is_visible` BOOLEAN DEFAULT TRUE,
     `created_date` TIMESTAMP NOT NULL,
 	`updated_date` TIMESTAMP NULL DEFAULT NULL,
     `uuid_shop` VARCHAR(40) NULL DEFAULT NULL,
@@ -266,6 +295,7 @@ CREATE TABLE IF NOT EXISTS `voucher` (
     FOREIGN KEY (`uuid_shop`)
     REFERENCES `shop` (`uuid_shop`)
 );
+
 CREATE UNIQUE INDEX `voucher_code` on `voucher` (`voucher_code` ASC) VISIBLE;
 -- -----------------------------------------------------
 -- Table `voucher`
@@ -344,15 +374,12 @@ CREATE TABLE IF NOT EXISTS `order_item` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
-
 SHOW WARNINGS;
 CREATE INDEX `uuid_product` ON `order_item` (`uuid_product` ASC) VISIBLE;
 
 SHOW WARNINGS;
 CREATE INDEX `uuid_order` ON `order_item` (`uuid_order` ASC) VISIBLE;
-
 SHOW WARNINGS;
-
 
 
 SHOW WARNINGS;

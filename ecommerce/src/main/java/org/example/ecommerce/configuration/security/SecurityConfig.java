@@ -34,18 +34,37 @@ import java.util.Collections;
 public class SecurityConfig {
 
     private final CustomJwtDecoder customJwtDecoder;
+    private final String[] PUBLIC_MATCHERS = {
+            "/auth/**",
+            "/products/info/**",
+            "/vouchers/info/**"
+    };
+    private final String[] USER_MATCHERS = {
+            "/cart/**",
+            "/users/info/**"
+    };
+    private final String[] SELLER_MATCHERS = {
+            "/shops/**"
+    };
+    private final String[] ADMIN_MATCHERS = {
+            "/users/management/**"
+    };
+    private final String[] ADMIN_SELLER_MATCHERS = {
+            "/products/management/**",
+            "/orders/management/**",
+            "/vouchers/management/**"
+    };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> { // authenticate and authorize
-                    request.requestMatchers("/auth/**").permitAll()
-                            .requestMatchers("/products/info/**").permitAll()
-                            .requestMatchers(HttpMethod.GET, "/vouchers/**").permitAll()
-                            .requestMatchers("/cart/**", "/users/info/**").hasRole("USER")
-                            .requestMatchers("/products/management/**").hasAnyRole("ADMIN", "SELLER")
-                            .requestMatchers("/users/management/**").hasRole("ADMIN")
+                    request.requestMatchers(PUBLIC_MATCHERS).permitAll()
+                            .requestMatchers(USER_MATCHERS).hasRole("USER")
+                            .requestMatchers(SELLER_MATCHERS).hasAnyRole("SELLER")
+                            .requestMatchers(ADMIN_MATCHERS).hasRole("ADMIN")
+                            .requestMatchers(ADMIN_SELLER_MATCHERS).hasAnyRole("ADMIN", "SELLER")
                             .anyRequest().authenticated();
                 })
                 .oauth2ResourceServer(

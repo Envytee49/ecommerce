@@ -41,4 +41,6 @@ public class CreateVoucherRequest {
     @NotNull
     @Min(value = 1)
     private Integer maxUsage;
+    @NotNull
+    private Boolean isVisible;
 }

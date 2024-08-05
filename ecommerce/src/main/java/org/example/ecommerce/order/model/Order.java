@@ -1,5 +1,6 @@
 package org.example.ecommerce.order.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,14 +25,20 @@ public class Order extends AbstractEntity {
     @Builder.Default
     private String uuidOrder = Utils.getUuid();
 
-    @Builder.Default
     @Size(max = 40)
-    @Column(name = "user_id")
-    private String userId = null;
+    @NotNull
+    @Column(name = "uuid_user")
+    private String uuidUser;
+
+    @NotNull
+    @Size(max = 40)
+    @Column(name = "uuid_shop")
+    @JsonIgnore
+    private String uuidShop;
 
     @NotNull
     @Column(name = "status")
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
     @NotNull

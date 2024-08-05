@@ -2,11 +2,14 @@ package org.example.ecommerce.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @AllArgsConstructor
 public enum ErrorCode {
     UNKNOWN(1, "Unknown Error"),
+
+    BAD_REQUEST(400, "Bad Request" ),
 
     UNAUTHENTICATED( 401 ,"Unauthenticated" ),
 
@@ -53,12 +56,26 @@ public enum ErrorCode {
 
     VOUCHER_CODE_EXISTED(1018, "Voucher Code Existed" ),
 
-    WRONG_OLD_PASSWORD(1019, "Wrong Old Password" );
+    WRONG_OLD_PASSWORD(1019, "Wrong Old Password" ),
+
+    CANCEL_ORDER_REASON_NOT_EXIST(1020,"Cancel Order Reason Not Exist" ),
+
+    ORDER_NOT_EXIST(1021,"Order Not Exist" ),
+
+    ORDER_CANNOT_BE_CANCELED(1022,"ORDER CANNOT BE CANCELED" ),
+
+    INVALID_DATE_VALUE(1023, null );
 
 
 
-    private final int code;
 
-    private final String message;
+    private int code;
+
+    private String message;
+
+    public ErrorCode setMessage(String message) {
+        this.message = message;
+        return this;
+    }
 
 }

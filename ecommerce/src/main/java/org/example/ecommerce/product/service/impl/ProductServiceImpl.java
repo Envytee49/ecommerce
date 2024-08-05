@@ -18,7 +18,7 @@ import org.example.ecommerce.product.repository.CategoryRepository;
 import org.example.ecommerce.product.repository.ProductRepository;
 import org.example.ecommerce.product.service.ProductManagementService;
 import org.example.ecommerce.product.service.ProductRetrieverService;
-import org.example.ecommerce.user.repository.ShopRepository;
+import org.example.ecommerce.shop.repository.ShopRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

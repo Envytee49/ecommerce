@@ -2,6 +2,7 @@ package org.example.ecommerce.order.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.example.ecommerce.user.model.UserAddress;
 
 @Builder
 @Getter
@@ -10,6 +11,15 @@ public class DeliveryInfo {
     private String city;
     private String street;
     private String district;
-    private Integer postalCode;
     private String receiver;
+
+    public static DeliveryInfo from(UserAddress userAddress) {
+        return DeliveryInfo.builder()
+                .district(userAddress.getDistrict())
+                .city(userAddress.getCity())
+                .street(userAddress.getStreet())
+                .mobile(userAddress.getMobile())
+                .receiver(userAddress.getReceiverName())
+                .build();
+    }
 }

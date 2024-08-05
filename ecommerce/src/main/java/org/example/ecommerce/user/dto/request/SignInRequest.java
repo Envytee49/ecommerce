@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SignInRequest {
-    @NotBlank
+    @NotBlank(message = "email must not be blank")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "password must not be blank")
     private String password;
 }
