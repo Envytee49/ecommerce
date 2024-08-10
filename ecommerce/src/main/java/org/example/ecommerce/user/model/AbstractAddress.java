@@ -3,12 +3,16 @@ package org.example.ecommerce.user.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @MappedSuperclass
-public abstract class AbstractAddress {
+public class AbstractAddress {
     @Size(max = 15)
     @Column(name = "mobile")
     protected String mobile;

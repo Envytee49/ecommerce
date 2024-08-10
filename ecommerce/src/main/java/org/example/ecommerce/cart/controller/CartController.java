@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.cart.dto.request.AddToCartRequest;
 import org.example.ecommerce.cart.dto.request.UpdateCartRequest;
-import org.example.ecommerce.cart.dto.response.CartResponse;
 import org.example.ecommerce.cart.service.CartService;
 import org.example.ecommerce.common.ApiResponse;
 import org.example.ecommerce.common.controller.AbstractController;

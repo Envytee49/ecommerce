@@ -31,7 +31,7 @@ public class CancelOrderServiceImpl implements CancelOrderService {
             throw new AppException(ErrorCode.CANCEL_ORDER_REASON_NOT_EXIST);
 
         Order order = orderRepository.findById(request.getUuidOrder())
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXIST));
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
 
         if (getNotAllowedToBeCancelledOrderStatus().contains(order.getStatus()))
             throw new AppException(ErrorCode.ORDER_CANNOT_BE_CANCELED);

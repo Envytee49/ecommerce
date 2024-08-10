@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.common.ApiResponse;
 import org.example.ecommerce.common.controller.AbstractController;
+import org.example.ecommerce.voucher.dto.request.CreatePlatformVoucherRequest;
 import org.example.ecommerce.voucher.dto.request.CreateProductVoucherRequest;
 import org.example.ecommerce.voucher.dto.request.CreateVoucherRequest;
 import org.example.ecommerce.voucher.dto.request.VoucherDistributionRequest;
@@ -30,7 +31,7 @@ public class VoucherManagementController extends AbstractController {
 
     @PostMapping("/free-shipping")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResponse<?> createFreeShippingVoucher(@RequestBody @Valid CreateVoucherRequest request) {
+    public ApiResponse<?> createFreeShippingVoucher(@RequestBody @Valid CreatePlatformVoucherRequest request) {
         return respond(() -> voucherService.createFreeShippingVoucher(request), "Voucher created");
     }
 

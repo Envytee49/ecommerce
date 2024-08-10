@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
     Optional<User> findByEmail(String email);
 
-    @Query(value = "SELECT u.uuidUser FROM User u")
+    @Query(value = "SELECT u.uuidUser FROM User u " +
+            "INNER JOIN UserRole ur ON ur.uuidUser = u.uuidUser AND ur.role = 'USER' ")
     List<String> getAllUuids();
 }

@@ -13,6 +13,8 @@ public enum ErrorCode {
 
     UNAUTHENTICATED( 401 ,"Unauthenticated" ),
 
+    INTERNAL_SERVER_ERROR(500, "Internal Server Error" ),
+
     INVALID_PARAMETER_DATA(998, null),
 
     PARAMETER_NOT_VALID(999, null),
@@ -60,14 +62,25 @@ public enum ErrorCode {
 
     CANCEL_ORDER_REASON_NOT_EXIST(1020,"Cancel Order Reason Not Exist" ),
 
-    ORDER_NOT_EXIST(1021,"Order Not Exist" ),
+    ORDER_NOT_FOUND(1021, "Order Not Found" ),
 
     ORDER_CANNOT_BE_CANCELED(1022,"ORDER CANNOT BE CANCELED" ),
 
-    INVALID_DATE_VALUE(1023, null );
+    INVALID_DATE_VALUE(1023, null ),
 
+    NO_ADDRESS_AVAILABLE(1024, "No Address Available" ),
 
+    INVALID_DISCOUNT_VALUE(1025, "Percentage Value Must Be Between 0 - 100%"),
 
+    SHOP_NAME_EXISTED(1026, "Shop Name Existed" ),
+
+    CATEGORY_NOT_FOUND(1027, "Category Not Found" ),
+
+    MISSING_VARIANT_OPTION(1028, "Please select all least one product variant" ),
+
+    PRODUCT_VARIANT_FOUND(1029, "Product Variant Not Found" ),
+
+    NOT_ENOUGH_STOCK(1030, "Not Enough Stock" );
 
     private int code;
 

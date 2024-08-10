@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.*;
 public class OrderController extends AbstractController {
     private final OrderService orderService;
 
+    @PatchMapping("/addresses/{uuidUAddress}")
+    @PreAuthorize("hasRole('USER')")
+    public ApiResponse<?> changeAddress(@PathVariable("uuidUAddress") String uuidUAddress) {
+        return respond(() -> orderService.changeAddress(uuidUAddress), "Change address successfully");
+    }
     @PostMapping("/place-order")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<?> placeOrder(@Valid @RequestBody PlaceOrderRequest request) {

@@ -10,7 +10,7 @@ import org.example.ecommerce.user.model.User;
 import org.example.ecommerce.user.repository.UserRepository;
 import org.example.ecommerce.user.service.AuthService;
 import org.example.ecommerce.configuration.jwt.JwtService;
-import org.example.ecommerce.voucher.repository.UserRoleRepository;
+import org.example.ecommerce.user.repository.UserRoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

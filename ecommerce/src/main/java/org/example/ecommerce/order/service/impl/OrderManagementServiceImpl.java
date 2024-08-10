@@ -34,8 +34,8 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     @Transactional
     @Override
     public void declineOrder(String uuidOrder) {
-        Order order = orderRepository.findById(uuidOrder)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXIST));
+        Order order = orderRepository.findByUuidOrderAndUuidShop(uuidOrder, SecurityUtils.getCurrentSellerShopUuid())
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setStatus(OrderStatus.ORDER_DECLINED);
         orderRepository.save(order);
     }
@@ -43,8 +43,8 @@ public class OrderManagementServiceImpl implements OrderManagementService {
     @Override
     @Transactional
     public void approveOrder(String uuidOrder) {
-        Order order = orderRepository.findById(uuidOrder)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXIST));
+        Order order = orderRepository.findByUuidOrderAndUuidShop(uuidOrder, SecurityUtils.getCurrentSellerShopUuid())
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setStatus(OrderStatus.ORDER_APPROVED);
         orderRepository.save(order);
     }

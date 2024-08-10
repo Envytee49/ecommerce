@@ -7,21 +7,30 @@ import org.example.ecommerce.common.dto.PageDtoIn;
 import org.example.ecommerce.common.dto.PageDtoOut;
 import org.example.ecommerce.common.util.Utils;
 import org.example.ecommerce.configuration.security.SecurityUtils;
+import org.example.ecommerce.exception.AppException;
+import org.example.ecommerce.exception.ErrorCode;
 import org.example.ecommerce.order.model.Order;
 import org.example.ecommerce.order.repository.OrderRepository;
+import org.example.ecommerce.shop.dto.request.CreateShopRequest;
 import org.example.ecommerce.shop.dto.request.RevenueRequest;
 import org.example.ecommerce.shop.dto.response.RevenueResponse;
 import org.example.ecommerce.shop.dto.response.TopBuyer;
 import org.example.ecommerce.shop.dto.response.TopSellingProduct;
+import org.example.ecommerce.shop.model.Shop;
+import org.example.ecommerce.shop.model.ShopAddress;
 import org.example.ecommerce.shop.projection.TBProjection;
 import org.example.ecommerce.shop.projection.TSPProjection;
+import org.example.ecommerce.shop.repository.ShopAddressRepository;
 import org.example.ecommerce.shop.repository.ShopRepository;
 import org.example.ecommerce.shop.service.ShopService;
+import org.example.ecommerce.user.service.UserManagementService;
+import org.example.ecommerce.user.service.impl.UserManagementServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 @Service
@@ -29,6 +38,9 @@ import java.util.List;
 public class ShopServiceImpl implements ShopService {
     private final ShopRepository shopRepository;
     private final OrderRepository orderRepository;
+    private final ShopAddressRepository shopAddressRepository;
+    private final UserManagementService userManagementService;
+
     @Override
     public PageDtoOut<RevenueResponse> getRevenue(RevenueRequest request) {
         PageDtoIn pageDtoIn = request.getPageDtoIn();
@@ -46,7 +58,7 @@ public class ShopServiceImpl implements ShopService {
                                 .builder()
                                 .orderDate(order.getCreatedDate().toLocalDate())
                                 .uuidOrder(order.getUuidOrder())
-                                .totalAmount(order.getTotal())
+                                .totalAmount(order.getTotalPayment())
                                 .build()
                 )
                 .toList();
@@ -105,6 +117,26 @@ public class ShopServiceImpl implements ShopService {
                 tbProjections.getTotalElements(),
                 topBuyers
         );
+    }
+
+    @Override
+    @Transactional
+    public void createShop(CreateShopRequest request) {
+        String name = request.getName();
+        if(shopRepository.findByName(name).isPresent()) throw new AppException(ErrorCode.SHOP_NAME_EXISTED);
+        Shop shop = Shop.builder().name(name).uuidSeller(SecurityUtils.getCurrentUserUuid()).build();
+        shopRepository.save(shop);
+        ShopAddress shopAddress = ShopAddress.builder()
+                .city(request.getCity())
+                .district(request.getDistrict())
+                .street(request.getStreet())
+                .mobile(request.getMobile())
+                .postalCode(request.getPostalCode())
+                .sellerName(request.getSellerName())
+                .uuidShop(shop.getUuidShop())
+                .build();
+        shopAddressRepository.save(shopAddress);
+        userManagementService.updateSellerRole();
     }
 
 }

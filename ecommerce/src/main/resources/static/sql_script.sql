@@ -23,20 +23,20 @@ USE `nest_ecom` ;
 -- -----------------------------------------------------
 -- Table `attribute`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `attribute` ;
+-- DROP TABLE IF EXISTS `attribute` ;
 
-SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `attribute` (
-  `uuid_attribute` VARCHAR(40) NOT NULL,
-  `_key` VARCHAR(40) NULL DEFAULT NULL,
-  `created_date` TIMESTAMP NULL DEFAULT NULL,
-  `updated_date` TIMESTAMP NULL DEFAULT NULL,
-  PRIMARY KEY (`uuid_attribute`))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+-- SHOW WARNINGS;
+-- CREATE TABLE IF NOT EXISTS `attribute` (
+--   `uuid_attribute` VARCHAR(40) NOT NULL,
+--   `_key` VARCHAR(40) NULL DEFAULT NULL,
+--   `created_date` TIMESTAMP NULL DEFAULT NULL,
+--   `updated_date` TIMESTAMP NULL DEFAULT NULL,
+--   PRIMARY KEY (`uuid_attribute`))
+-- ENGINE = InnoDB
+-- DEFAULT CHARACTER SET = utf8mb4
+-- COLLATE = utf8mb4_0900_ai_ci;
 
-SHOW WARNINGS;
+-- SHOW WARNINGS;
 -- -----------------------------------------------------
 -- Table `user`
 -- -----------------------------------------------------
@@ -135,9 +135,8 @@ CREATE TABLE IF NOT EXISTS `product` (
   `title` VARCHAR(75) NOT NULL,
   `meta_title` VARCHAR(100) NULL DEFAULT NULL,
   `summary` TEXT NULL DEFAULT NULL,
-  `type` SMALLINT NOT NULL DEFAULT '0',
   `price` DOUBLE NOT NULL DEFAULT '0',
-  `discount` DOUBLE NULL DEFAULT '0',
+  `discount` decimal(3,2) default 0 CHECK (`discount` BETWEEN 0.00 AND 1.00),
   `quantity` SMALLINT NOT NULL DEFAULT '0',
   `created_date` TIMESTAMP NOT NULL,
   `updated_date` TIMESTAMP NULL DEFAULT NULL,
@@ -154,21 +153,253 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 CREATE UNIQUE INDEX `product_title` ON `product` (`title` ASC) VISIBLE;
+
+drop table if exists product_variant;
+CREATE TABLE IF NOT EXISTS `product_variant` (
+  `uuid_product_variant` VARCHAR(36) NOT NULL,
+  `uuid_product` VARCHAR(40) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  PRIMARY KEY (`uuid_product_variant`),
+  UNIQUE KEY `UNIQUE_product_id_name` (`uuid_product`,`name`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `product_variant`
+--
+
+INSERT INTO `product_variant` (`uuid_product_variant`, `uuid_product`, `name`) VALUES
+('1eb4f263-48b3-4900-bd83-beebe9808c63', '02e8ccf6-05b5-4db9-b26a-fc4e6c56f972', 'Size'),
+('27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', '02e8ccf6-05b5-4db9-b26a-fc4e6c56f972', 'Color'),
+
+('55ab5946-dc10-4bdb-a8d5-24324c3b6574', '2ef1523d-27bf-4318-93e1-df59bc6ada51', 'Size'),
+('77f04d02-291d-4fe5-98c0-f2d96364730d', '2ef1523d-27bf-4318-93e1-df59bc6ada51', 'Color'),
+
+('12039af5-3001-4481-a413-84974950b964', '784e3346-aebe-48d9-9327-a73554c3ce22', 'Size'),
+('7c0a396c-0933-49c2-891b-db9168edad4c', '784e3346-aebe-48d9-9327-a73554c3ce22', 'Color'),
+
+('b9936167-4e01-4e73-bba9-1ee600d2a75e', 'b22ddaf2-e7c8-410b-9ff4-e6aa1cac30b6', 'Size'),
+('3e7c5487-c30d-46c3-9a20-47a60b55b998', 'b22ddaf2-e7c8-410b-9ff4-e6aa1cac30b6', 'Color');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_variant_option`
+--
+drop table if exists product_variant_option;
+CREATE TABLE IF NOT EXISTS `product_variant_option` (
+  `uuid_product_variant_option` VARCHAR(36) NOT NULL ,
+  `uuid_product_variant` VARCHAR(36) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  PRIMARY KEY (`uuid_product_variant_option`),
+  UNIQUE KEY `UNIQUE_product_variant_id_name` (`uuid_product_variant`,`name`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `product_variant_option`
+--
+
+INSERT INTO `product_variant_option` (`uuid_product_variant_option`, `uuid_product_variant`, `name`) VALUES
+('9db66a6e-5f6c-4c8b-b087-6968087ee80e', '1eb4f263-48b3-4900-bd83-beebe9808c63', 'Large'),
+('3390b49d-2aca-4ec9-bf64-3dc138ad6d81','1eb4f263-48b3-4900-bd83-beebe9808c63', 'Small'),
+('b5af5e48-2c15-42ab-962a-c1fba2aa14ce', '27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', 'Black'),
+('aab52b75-debe-477d-9afc-5ff415382487', '27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', 'White'),
+
+('0c0b613b-6014-4755-8712-d4df1bab0be2', '55ab5946-dc10-4bdb-a8d5-24324c3b6574', 'Large'),
+('af8dd210-d41d-4fa2-90d7-3ef2cd26886c','55ab5946-dc10-4bdb-a8d5-24324c3b6574', 'Small'),
+('754393b5-64d5-4748-8145-d59b688adbaa', '77f04d02-291d-4fe5-98c0-f2d96364730d', 'Red'),
+('5c4ab121-5d23-465c-aa2a-4236a30e417b', '77f04d02-291d-4fe5-98c0-f2d96364730d', 'Blue'),
+
+('dfc2fdc2-e893-4e5c-a224-32edff6f1400', '12039af5-3001-4481-a413-84974950b964', 'Large'),
+('8ea0f521-fda3-470e-8153-9e58f513d2c6','12039af5-3001-4481-a413-84974950b964', 'Small'),
+('e495ee64-411c-4d65-a692-415562d0c5b7', '7c0a396c-0933-49c2-891b-db9168edad4c', 'Grey'),
+('a0dc3c75-3a7d-439d-98bc-84c3fdece4e6', '7c0a396c-0933-49c2-891b-db9168edad4c', 'Pink'),
+
+('8ea08453-ca4a-4779-b782-fccc4db60105', 'b9936167-4e01-4e73-bba9-1ee600d2a75e', 'Large'),
+('2073d13a-9785-4811-8fc6-d68aaf6033fa','b9936167-4e01-4e73-bba9-1ee600d2a75e', 'Small'),
+('08a022d4-c816-44a3-b55b-68d262397ba1', '3e7c5487-c30d-46c3-9a20-47a60b55b998', 'Green'),
+('a4072c9f-d0aa-41c7-a3a5-a6bf8b2cd3c9', '3e7c5487-c30d-46c3-9a20-47a60b55b998', 'Purple');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sku`
+--
+drop table if exists sku;
+
+CREATE TABLE IF NOT EXISTS `sku` (
+  `uuid_sku` VARCHAR(36) NOT NULL ,
+  `uuid_product` VARCHAR(40) NOT NULL,
+  `sku` varchar(45) NOT NULL,
+  `discount` decimal(3,2) default 0 CHECK (`discount` BETWEEN 0.00 AND 1.00),
+  `price` decimal(10,2) NOT NULL,
+  `quantity` integer NOT NULL,
+  PRIMARY KEY (`uuid_sku`),
+  KEY `skus_product_id_products_id_idx` (`uuid_product`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `sku`
+--
+
+INSERT INTO `sku` (`uuid_sku`, `uuid_product`, `sku`, `price`, `quantity`) VALUES
+('10dc4b19-3e11-41c8-b194-62b2d5e034d8', '02e8ccf6-05b5-4db9-b26a-fc4e6c56f972', 'W1', '120.99', 5),
+('55374df5-91bd-465b-8246-936b00bc38a6', '02e8ccf6-05b5-4db9-b26a-fc4e6c56f972', 'W2', '125.99', 3),
+('3da27443-ad38-4b27-afc7-237417da2c09', '02e8ccf6-05b5-4db9-b26a-fc4e6c56f972', 'W3', '130.99', 4),
+('d0671159-7cc4-4d3c-944e-5b0faad1c64c', '02e8ccf6-05b5-4db9-b26a-fc4e6c56f972', 'W4', '135.99', 1),
+
+('70b399a5-f7c0-499b-b3c9-4fcda7516551', '2ef1523d-27bf-4318-93e1-df59bc6ada51', 'W5', '150', 3),
+('acaef534-4b92-4dba-bb05-2c3611146c79', '2ef1523d-27bf-4318-93e1-df59bc6ada51', 'W6', '155', 2),
+('a6ee6f05-d1e8-4ce4-aa92-294d9771e1d5', '2ef1523d-27bf-4318-93e1-df59bc6ada51', 'W7', '160', 4),
+('8b81fcff-de4a-46a1-93de-d0b17b4c39f0', '2ef1523d-27bf-4318-93e1-df59bc6ada51', 'W8', '165', 1),
+
+('901a1f9f-976d-427a-bd75-c57acf35be71', '784e3346-aebe-48d9-9327-a73554c3ce22', 'W9', '140', 10),
+('91905a8f-a455-47e9-b02a-5e04b0ed06de', '784e3346-aebe-48d9-9327-a73554c3ce22', 'W10', '145', 34),
+('06af0756-209c-4601-9c68-28b2ae77c4c3', '784e3346-aebe-48d9-9327-a73554c3ce22', 'W11', '155', 3),
+('57636f83-1ccf-4629-a5f1-4e260a32c9cc', '784e3346-aebe-48d9-9327-a73554c3ce22', 'W12', '130', 1),
+
+('7a894865-0849-49e9-b627-3862854b03e8', 'b22ddaf2-e7c8-410b-9ff4-e6aa1cac30b6', 'W13', '110', 3),
+('3d2dea90-4988-47b9-8988-57e78bc94964', 'b22ddaf2-e7c8-410b-9ff4-e6aa1cac30b6', 'W14', '115', 2),
+('4fb0af92-ed90-40b4-a496-0b62c3a093f9', 'b22ddaf2-e7c8-410b-9ff4-e6aa1cac30b6', 'W15', '120', 12),
+('e0410521-e4dc-4cb4-b0c5-dada8a58b21f', 'b22ddaf2-e7c8-410b-9ff4-e6aa1cac30b6', 'W16', '125', 1);
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `sku_product_variant_options`
+--
+DROP TABLE IF exists sku_product_variant_option;
+
+CREATE TABLE IF NOT EXISTS `sku_product_variant_option` (
+  `uuid_sku` VARCHAR(40) NOT NULL,
+  `uuid_product_variant` VARCHAR(40) NOT NULL,
+  `uuid_product_variant_option` VARCHAR(40) NOT NULL,
+  PRIMARY KEY (`uuid_sku`,`uuid_product_variant_option`,`uuid_product_variant`),
+  UNIQUE KEY `UNIQUE_sku_id_product_variant_id` (`uuid_sku`,`uuid_product_variant`),
+  KEY `spvo_product_variant_options_id_pro_idx` (`uuid_product_variant_option`),
+  KEY `spvo_product_variant_id_product_var_idx` (`uuid_product_variant`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `sku_product_variant_options`
+--
+
+INSERT INTO `sku_product_variant_option` (`uuid_sku`, `uuid_product_variant`, `uuid_product_variant_option`) VALUES
+-- 1
+('10dc4b19-3e11-41c8-b194-62b2d5e034d8', '1eb4f263-48b3-4900-bd83-beebe9808c63', '9db66a6e-5f6c-4c8b-b087-6968087ee80e'),
+('10dc4b19-3e11-41c8-b194-62b2d5e034d8', '27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', 'b5af5e48-2c15-42ab-962a-c1fba2aa14ce'),
+
+('55374df5-91bd-465b-8246-936b00bc38a6', '1eb4f263-48b3-4900-bd83-beebe9808c63', '9db66a6e-5f6c-4c8b-b087-6968087ee80e'),
+('55374df5-91bd-465b-8246-936b00bc38a6', '27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', 'aab52b75-debe-477d-9afc-5ff415382487'),
+
+('3da27443-ad38-4b27-afc7-237417da2c09', '1eb4f263-48b3-4900-bd83-beebe9808c63', '3390b49d-2aca-4ec9-bf64-3dc138ad6d81'),
+('3da27443-ad38-4b27-afc7-237417da2c09', '27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', 'b5af5e48-2c15-42ab-962a-c1fba2aa14ce'),
+
+('d0671159-7cc4-4d3c-944e-5b0faad1c64c', '1eb4f263-48b3-4900-bd83-beebe9808c63', '3390b49d-2aca-4ec9-bf64-3dc138ad6d81'),
+('d0671159-7cc4-4d3c-944e-5b0faad1c64c', '27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', 'aab52b75-debe-477d-9afc-5ff415382487'),
+
+-- 2
+
+('70b399a5-f7c0-499b-b3c9-4fcda7516551', '55ab5946-dc10-4bdb-a8d5-24324c3b6574','0c0b613b-6014-4755-8712-d4df1bab0be2'),
+('70b399a5-f7c0-499b-b3c9-4fcda7516551','77f04d02-291d-4fe5-98c0-f2d96364730d', '754393b5-64d5-4748-8145-d59b688adbaa'),
+
+('acaef534-4b92-4dba-bb05-2c3611146c79', '55ab5946-dc10-4bdb-a8d5-24324c3b6574', '0c0b613b-6014-4755-8712-d4df1bab0be2'),
+('acaef534-4b92-4dba-bb05-2c3611146c79', '77f04d02-291d-4fe5-98c0-f2d96364730d', '5c4ab121-5d23-465c-aa2a-4236a30e417b'),
+
+('a6ee6f05-d1e8-4ce4-aa92-294d9771e1d5', '55ab5946-dc10-4bdb-a8d5-24324c3b6574', 'af8dd210-d41d-4fa2-90d7-3ef2cd26886c'),
+('a6ee6f05-d1e8-4ce4-aa92-294d9771e1d5', '77f04d02-291d-4fe5-98c0-f2d96364730d', '754393b5-64d5-4748-8145-d59b688adbaa'),
+
+('8b81fcff-de4a-46a1-93de-d0b17b4c39f0', '55ab5946-dc10-4bdb-a8d5-24324c3b6574', 'af8dd210-d41d-4fa2-90d7-3ef2cd26886c'),
+('8b81fcff-de4a-46a1-93de-d0b17b4c39f0','77f04d02-291d-4fe5-98c0-f2d96364730d', '5c4ab121-5d23-465c-aa2a-4236a30e417b'),
+-- 3
+
+('901a1f9f-976d-427a-bd75-c57acf35be71', '12039af5-3001-4481-a413-84974950b964', 'dfc2fdc2-e893-4e5c-a224-32edff6f1400'),
+('901a1f9f-976d-427a-bd75-c57acf35be71', '7c0a396c-0933-49c2-891b-db9168edad4c', 'e495ee64-411c-4d65-a692-415562d0c5b7'),
+
+('91905a8f-a455-47e9-b02a-5e04b0ed06de', '12039af5-3001-4481-a413-84974950b964', 'dfc2fdc2-e893-4e5c-a224-32edff6f1400'),
+('91905a8f-a455-47e9-b02a-5e04b0ed06de', '7c0a396c-0933-49c2-891b-db9168edad4c', 'a0dc3c75-3a7d-439d-98bc-84c3fdece4e6'),
+
+('06af0756-209c-4601-9c68-28b2ae77c4c3', '12039af5-3001-4481-a413-84974950b964', '8ea0f521-fda3-470e-8153-9e58f513d2c6'),
+('06af0756-209c-4601-9c68-28b2ae77c4c3', '7c0a396c-0933-49c2-891b-db9168edad4c', 'e495ee64-411c-4d65-a692-415562d0c5b7'),
+
+('57636f83-1ccf-4629-a5f1-4e260a32c9cc', '12039af5-3001-4481-a413-84974950b964', '8ea0f521-fda3-470e-8153-9e58f513d2c6'),
+('57636f83-1ccf-4629-a5f1-4e260a32c9cc', '7c0a396c-0933-49c2-891b-db9168edad4c', 'a0dc3c75-3a7d-439d-98bc-84c3fdece4e6'),
+
+-- 4
+
+('7a894865-0849-49e9-b627-3862854b03e8', 'b9936167-4e01-4e73-bba9-1ee600d2a75e', '8ea08453-ca4a-4779-b782-fccc4db60105'),
+('7a894865-0849-49e9-b627-3862854b03e8', '3e7c5487-c30d-46c3-9a20-47a60b55b998', '08a022d4-c816-44a3-b55b-68d262397ba1'),
+
+('3d2dea90-4988-47b9-8988-57e78bc94964', 'b9936167-4e01-4e73-bba9-1ee600d2a75e', '8ea08453-ca4a-4779-b782-fccc4db60105'),
+('3d2dea90-4988-47b9-8988-57e78bc94964', '3e7c5487-c30d-46c3-9a20-47a60b55b998', 'a4072c9f-d0aa-41c7-a3a5-a6bf8b2cd3c9'),
+
+('4fb0af92-ed90-40b4-a496-0b62c3a093f9', 'b9936167-4e01-4e73-bba9-1ee600d2a75e', '2073d13a-9785-4811-8fc6-d68aaf6033fa'),
+('4fb0af92-ed90-40b4-a496-0b62c3a093f9', '3e7c5487-c30d-46c3-9a20-47a60b55b998', '08a022d4-c816-44a3-b55b-68d262397ba1'),
+
+('e0410521-e4dc-4cb4-b0c5-dada8a58b21f', 'b9936167-4e01-4e73-bba9-1ee600d2a75e', '2073d13a-9785-4811-8fc6-d68aaf6033fa'),
+('e0410521-e4dc-4cb4-b0c5-dada8a58b21f','3e7c5487-c30d-46c3-9a20-47a60b55b998', 'a4072c9f-d0aa-41c7-a3a5-a6bf8b2cd3c9');
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `product_variant`
+--
+ALTER TABLE `product_variant`
+  ADD CONSTRAINT `product_variants_product_id_products_id` 
+  FOREIGN KEY (`uuid_product`) 
+  REFERENCES `product` (`uuid_product`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+--
+-- Constraints for table `product_variant_option`
+--
+ALTER TABLE `product_variant_option`
+  ADD CONSTRAINT `product_variant_options_product_variant_id_product_variants_id` 
+  FOREIGN KEY (`uuid_product_variant`) 
+  REFERENCES `product_variant` (`uuid_product_variant`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+--
+-- Constraints for table `skus`
+--
+ALTER TABLE `sku`
+  ADD CONSTRAINT `skus_product_id_products_id` 
+  FOREIGN KEY (`uuid_product`) 
+  REFERENCES `product` (`uuid_product`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+--
+-- Constraints for table `sku_product_variant_options`
+--
+ALTER TABLE `sku_product_variant_option`
+  ADD CONSTRAINT `sku_product_variant_options_sku_id_skus_id` 
+  FOREIGN KEY (`uuid_sku`) 
+  REFERENCES `sku` (`uuid_sku`)
+  ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `spvo_product_variant_options_id_product_variant_options_id` 
+  FOREIGN KEY (`uuid_product_variant_option`) 
+  REFERENCES `product_variant_option` (`uuid_product_variant_option`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `spvo_product_variant_id_product_variants_id` 
+  FOREIGN KEY (`uuid_product_variant`) 
+  REFERENCES `product_variant` (`uuid_product_variant`) ON DELETE NO ACTION ON UPDATE NO ACTION;
+ 
 -- -----------------------------------------------------
 -- Table `cart_item`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `cart_item` ;
+
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `cart_item` (
 	`uuid_cart_item` VARCHAR(40) NOT NULL,
   `uuid_cart` VARCHAR(40) NOT NULL,
   `uuid_product` VARCHAR(40) NOT NULL,
-  `uuid_shop` VARCHAR(40) NOT NULL,
+  `uuid_sku` VARCHAR(36) NULL,
   `price` DECIMAL(10,2) NOT NULL DEFAULT '0',
-  `discount` DOUBLE NOT NULL DEFAULT '0',
+  `discount` DECIMAL(3,2) default 0 CHECK (`discount` BETWEEN 0.00 AND 1.00),
   `quantity` SMALLINT NOT NULL DEFAULT '0',
   `active` SMALLINT NOT NULL DEFAULT '0',
-  `content` TEXT NULL DEFAULT NULL,
   `created_date` TIMESTAMP NOT NULL,
   `updated_date` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`uuid_cart_item`),
@@ -217,12 +448,13 @@ SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `order` (
   `uuid_order` VARCHAR(40) NOT NULL,
   `uuid_user` VARCHAR(40) NULL DEFAULT NULL,
-  `uuid_user` VARCHAR(40) NULL DEFAULT NULL,
+  `uuid_shop` VARCHAR(40) NULL DEFAULT NULL,
   `status` enum('ORDER_PLACED', 'ORDER_APPROVED', 'ORDER_DECLINED', 'ORDER_SHIPPED', 'DELIVERED', 'CANCELLED') NOT NULL, -- enum or varchar here
-  `subtotal` DOUBLE NOT NULL DEFAULT '0',
-  `shipping` DOUBLE NOT NULL DEFAULT '0',
-  `total` DOUBLE NOT NULL DEFAULT '0',
-  `discount` DOUBLE NOT NULL DEFAULT '0',
+  `merchandise_subtotal` DOUBLE NOT NULL DEFAULT '0',
+  `shipping_subtotal` DOUBLE NOT NULL DEFAULT '0',
+  `shipping_discount_subtotal` DOUBLE NOT NULL DEFAULT '0',
+  `voucher_discount` DOUBLE NOT NULL DEFAULT '0',
+  `total_payment` DOUBLE NOT NULL DEFAULT '0',
   `created_date` TIMESTAMP NOT NULL,
   `updated_date` TIMESTAMP NULL DEFAULT NULL,
   `payment_method` VARCHAR(10) NOT NULL,
@@ -230,7 +462,7 @@ CREATE TABLE IF NOT EXISTS `order` (
   `uuid_uaddress` VARCHAR(40) NOT NULL,
   PRIMARY KEY (`uuid_order`),
   CONSTRAINT `order_ibfk_1`
-    FOREIGN KEY (`user_id`)
+    FOREIGN KEY (`uuid_user`)
     REFERENCES `user` (`uuid_user`),
 	CONSTRAINT `order_ibfk_2`
     FOREIGN KEY (`uuid_uaddress`)
@@ -240,9 +472,9 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 SHOW WARNINGS;
-CREATE INDEX `user_id` ON `order` (`user_id` ASC) VISIBLE;
+CREATE INDEX `uuid_user` ON `order` (`uuid_user` ASC) VISIBLE;
 SHOW WARNINGS;
-CREATE INDEX `user_shop` ON `order` (`user_shop` ASC) VISIBLE;
+CREATE INDEX `uuid_shop` ON `order` (`uuid_shop` ASC) VISIBLE;
 -- -----------------------------------------------------
 -- Table `cancel_order_reason`
 -- -----------------------------------------------------
@@ -252,7 +484,9 @@ SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `cancel_order_reason` (
 	`uuid_reason` VARCHAR(40) NOT NULL PRIMARY KEY,
     `reason` VARCHAR(100) NOT NULL
-);
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `cancelled_order`
 -- -----------------------------------------------------
@@ -270,49 +504,146 @@ CREATE TABLE IF NOT EXISTS `cancelled_order` (
     CONSTRAINT `cancelled_order_2`
     FOREIGN KEY (`uuid_reason`)
     REFERENCES `cancel_order_reason` (`uuid_reason`)
-);
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
 
 -- -----------------------------------------------------
--- Table `voucher`
+-- Table `shop_voucher`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `voucher` ;
+DROP TABLE IF EXISTS `shop_voucher` ;
 SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `voucher` (
-	`uuid_voucher` VARCHAR(40) NOT NULL,
-    `voucher_name` VARCHAR(200) NOT NULL,
+CREATE TABLE IF NOT EXISTS `shop_voucher` (
+	`uuid_voucher` VARCHAR(40) NOT NULL,    
+    `voucher_type` ENUM('ALL_SHOP', 'PRODUCTS') NOT NULL,
+    `uuid_shop` VARCHAR(40) NULL DEFAULT NULL,
+    `uuid_voucher_info` VARCHAR(40) NOT NULL,
+    `uuid_voucher_constraint` VARCHAR(40) NOT NULL,
+    PRIMARY KEY(`uuid_voucher`),
+    CONSTRAINT `shop_voucher_ibfk_1`
+    FOREIGN KEY (`uuid_shop`)
+    REFERENCES `shop` (`uuid_shop`),
+    CONSTRAINT `shop_voucher_ibfk_2`
+    FOREIGN KEY (`uuid_voucher_info`)
+    REFERENCES `voucher_info` (`uuid_voucher_info`),
+    CONSTRAINT `shop_voucher_ibfk_3`
+    FOREIGN KEY (`uuid_voucher_constraint`)
+    REFERENCES `voucher_constraint` (`uuid_voucher_constraint`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+-- -----------------------------------------------------
+-- Table `platform_voucher`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `platform_voucher` ;
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `platform_voucher` (
+	`uuid_voucher` VARCHAR(40) NOT NULL,    
+    `voucher_type` ENUM('FREE_SHIPPING', 'DISCOUNT_CASHBACK') NOT NULL,
+    `uuid_category` VARCHAR(40) NULL DEFAULT NULL,
+    `uuid_voucher_info` VARCHAR(40) NOT NULL,
+     `uuid_voucher_constraint` VARCHAR(40) NOT NULL,
+    PRIMARY KEY(`uuid_voucher`),
+    CONSTRAINT `platform_voucher_ibfk_1`
+    FOREIGN KEY (`uuid_category`)
+    REFERENCES `category` (`uuid_category`),
+    CONSTRAINT `platform_voucher_ibfk_2`
+    FOREIGN KEY (`uuid_voucher_info`)
+    REFERENCES `voucher_info` (`uuid_voucher_info`),
+    CONSTRAINT `platform_voucher_ibfk_3`
+    FOREIGN KEY (`uuid_voucher_constraint`)
+    REFERENCES `voucher_constraint` (`uuid_voucher_constraint`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+-- -----------------------------------------------------
+-- Table `voucher_info`
+-- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `voucher_info` ;
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `voucher_info` (
+	`uuid_voucher_info` VARCHAR(40) NOT NULL,    
     `voucher_code` VARCHAR(20) NOT NULL,
-     `voucher_type` ENUM('ALL_SHOP', 'PRODUCTS') NOT NULL,
     `quantity` INTEGER NOT NULL,
-    `discount` DOUBLE NULL DEFAULT NULL,
-    `discount_type` ENUM('PERCENTAGE', 'FIXED') NOT NULL,
+    `discount_type` ENUM('FIXED','PERCENTAGE'),
+    `discount_percentage` DECIMAL(3,2) DEFAULT 0 CHECK(`discount_percentage` between 0.00 AND 1.00),
+    `discount_value` DECIMAL(10,2) NULL DEFAULT NULL,
+    `discount_cap` DOUBLE NOT NULL,
     `description` VARCHAR(200) NOT NULL,
     `is_visible` BOOLEAN DEFAULT TRUE,
     `created_date` TIMESTAMP NOT NULL,
 	`updated_date` TIMESTAMP NULL DEFAULT NULL,
-    `uuid_shop` VARCHAR(40) NULL DEFAULT NULL,
-    PRIMARY KEY(`uuid_voucher`),
-    CONSTRAINT `voucher_ibfk_1`
-    FOREIGN KEY (`uuid_shop`)
-    REFERENCES `shop` (`uuid_shop`)
-);
-
-CREATE UNIQUE INDEX `voucher_code` on `voucher` (`voucher_code` ASC) VISIBLE;
+    PRIMARY KEY(`uuid_voucher_info`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
--- Table `voucher`
+-- Table `percentage_discount`
+-- -----------------------------------------------------
+-- DROP TABLE IF EXISTS `percentage_discount` ;
+-- SHOW WARNINGS;
+-- CREATE TABLE IF NOT EXISTS `percentage_discount` (
+--     `uuid_percentage_discount` VARCHAR(40) NOT NULL,
+--     `uuid_voucher_info` VARCHAR(40) NOT NULL, 
+--     `discount_percentage` DECIMAL(3,2) DEFAULT 0 CHECK(`discount_percentage` between 0.00 AND 1.00),
+--     PRIMARY KEY(`uuid_percentage_discount`),
+--     CONSTRAINT `pd_idx_1` 
+--     FOREIGN KEY (`uuid_voucher_info`) 
+--     REFERENCES `voucher_info` (`uuid_voucher_info`)
+-- )ENGINE = InnoDB
+-- DEFAULT CHARACTER SET = utf8mb4
+-- COLLATE = utf8mb4_0900_ai_ci;
+-- -- -----------------------------------------------------
+-- -- Table `fixed_discount`
+-- -- -----------------------------------------------------
+-- DROP TABLE IF EXISTS `fixed_discount` ;
+-- SHOW WARNINGS;
+-- CREATE TABLE IF NOT EXISTS `fixed_discount` (
+--     `uuid_fixed_discount` VARCHAR(40) NOT NULL,
+--     `uuid_voucher_info` VARCHAR(40) NOT NULL, 
+--     `discount_value` DECIMAL(10,2) DEFAULT 0,
+--     PRIMARY KEY(`uuid_fixed_discount`),
+--     CONSTRAINT `fd_idx_1` 
+--     FOREIGN KEY (`uuid_voucher_info`) 
+--     REFERENCES `voucher_info` (`uuid_voucher_info`)
+-- )ENGINE = InnoDB
+-- DEFAULT CHARACTER SET = utf8mb4
+-- COLLATE = utf8mb4_0900_ai_ci;
+
+-- -----------------------------------------------------
+-- Table `voucher_constraint`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `voucher_constraint` ;
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `voucher_constraint` (
-	`uuid_voucher` VARCHAR(40) NOT NULL,
+	`uuid_voucher_constraint` VARCHAR(40) NOT NULL,
     `valid_from` DATE NOT NULL,
     `valid_until` DATE NOT NULL,
     `minimum_spend` DOUBLE NOT NULL,
     `max_usage` INTEGER NOT NULL,
-    PRIMARY KEY(`uuid_voucher`),
-    CONSTRAINT `vc_ibfk_1`
-    FOREIGN KEY (`uuid_voucher`)
-    REFERENCES `voucher` (`uuid_voucher`)
-);
+    PRIMARY KEY(`uuid_voucher_constraint`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+-- -----------------------------------------------------
+-- Table `voucher_constraint`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `voucher_constraint` ;
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `voucher_constraint` (
+	`uuid_voucher_constraint` VARCHAR(40) NOT NULL,
+    `valid_from` DATE NOT NULL,
+    `valid_until` DATE NOT NULL,
+    `minimum_spend` DOUBLE NOT NULL,
+    `max_usage` INTEGER NOT NULL,
+    PRIMARY KEY(`uuid_voucher_constraint`)
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `product_voucher`
 -- -----------------------------------------------------
@@ -324,11 +655,13 @@ CREATE TABLE IF NOT EXISTS `product_voucher` (
     PRIMARY KEY (`uuid_voucher`, `uuid_product`),
     CONSTRAINT `vp_ibfk_1`
     FOREIGN KEY (`uuid_voucher`)
-    REFERENCES `voucher` (`uuid_voucher`),
+    REFERENCES `abstractVoucher` (`uuid_voucher`),
     CONSTRAINT `vp_ibfk_2`
     FOREIGN KEY (`uuid_product`)
     REFERENCES `product` (`uuid_product`)
-);
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- Table `voucher_redemption`
 -- ----------------------------------------------------
@@ -341,29 +674,28 @@ CREATE TABLE IF NOT EXISTS `voucher_redemption` (
     `usage` INTEGER NOT NULL DEFAULT 0,
     `redemption_date` DATE NOT NULL,
     PRIMARY KEY (`uuid_voucher`, `uuid_user`),
-    CONSTRAINT `vr_ibfk_1`
-    FOREIGN KEY (`uuid_voucher`)
-    REFERENCES `voucher` (`uuid_voucher`),
     CONSTRAINT `vr_ibfk_2`
     FOREIGN KEY (`uuid_user`)
     REFERENCES `user` (`uuid_user`)
-);
+)ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+CREATE INDEX `vr_idx_1` ON `voucher_redemption` (`uuid_voucher` ASC) VISIBLE;
 -- -----------------------------------------------------
 -- Table `order_item`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `order_item` ;
-
 SHOW WARNINGS;
 CREATE TABLE IF NOT EXISTS `order_item` (
   `uuid_order_item` VARCHAR(40) NOT NULL,
   `uuid_product` VARCHAR(40) NOT NULL,
+   `uuid_sku` VARCHAR(36) NULL,
   `uuid_order` VARCHAR(40) NOT NULL,
   `price` DOUBLE NOT NULL DEFAULT '0',
-  `discount` DOUBLE NOT NULL DEFAULT '0',
+  `discount` decimal(3,2) default 0 CHECK (`discount` BETWEEN 0.00 AND 1.00),
   `quantity` SMALLINT NOT NULL DEFAULT '0',
   `created_date` TIMESTAMP NOT NULL,
   `updated_date` TIMESTAMP NULL DEFAULT NULL,
-  `content` TEXT NULL DEFAULT NULL,
   PRIMARY KEY (`uuid_order_item`),
   CONSTRAINT `order_item_ibfk_1`
     FOREIGN KEY (`uuid_product`)
@@ -387,35 +719,36 @@ SHOW WARNINGS;
 -- -----------------------------------------------------
 -- Table `product_attribute`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `product_attribute` ;
+-- DROP TABLE IF EXISTS `product_attribute` ;
 
-SHOW WARNINGS;
-CREATE TABLE IF NOT EXISTS `product_attribute` (
-  `uuid_attribute` VARCHAR(40) NOT NULL,
-  `uuid_product` VARCHAR(40) NOT NULL,
-  `_value` VARCHAR(200) NULL DEFAULT NULL,
-  PRIMARY KEY (`uuid_product`, `uuid_attribute`),
-  CONSTRAINT `fk_product_attribute_product1`
-    FOREIGN KEY (`uuid_product`)
-    REFERENCES `product` (`uuid_product`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_product_attribute_attribute1`
-    FOREIGN KEY (`uuid_attribute`)
-    REFERENCES `attribute` (`uuid_attribute`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
+-- SHOW WARNINGS;
+-- CREATE TABLE IF NOT EXISTS `product_attribute` (
+-- 	`uuid_product_attribute` VARCHAR(40) NOT NULL,
+--   `uuid_attribute` VARCHAR(40) NOT NULL,
+--   `uuid_product` VARCHAR(40) NOT NULL,
+--   `_value` VARCHAR(200) NULL DEFAULT NULL,
+--   PRIMARY KEY (`uuid_product_attribute`),
+--   CONSTRAINT `fk_product_attribute_product1`
+--     FOREIGN KEY (`uuid_product`)
+--     REFERENCES `product` (`uuid_product`)
+--     ON DELETE NO ACTION
+--     ON UPDATE NO ACTION,
+--   CONSTRAINT `fk_product_attribute_attribute1`
+--     FOREIGN KEY (`uuid_attribute`)
+--     REFERENCES `attribute` (`uuid_attribute`)
+--     ON DELETE NO ACTION
+--     ON UPDATE NO ACTION)
+-- ENGINE = InnoDB
+-- DEFAULT CHARACTER SET = utf8mb4
+-- COLLATE = utf8mb4_0900_ai_ci;
 
-SHOW WARNINGS;
-CREATE INDEX `uuid_attribute` ON `product_attribute` (`uuid_attribute` ASC) VISIBLE;
+-- SHOW WARNINGS;
+-- CREATE INDEX `uuid_attribute` ON `product_attribute` (`uuid_attribute` ASC) VISIBLE;
 
-SHOW WARNINGS;
-CREATE INDEX `uuid_product` ON `product_attribute` (`uuid_product` ASC) VISIBLE;
+-- SHOW WARNINGS;
+-- CREATE INDEX `uuid_product` ON `product_attribute` (`uuid_product` ASC) VISIBLE;
 
-SHOW WARNINGS;
+-- SHOW WARNINGS;
 
 -- -----------------------------------------------------
 -- Table `product_category`
@@ -458,7 +791,6 @@ CREATE TABLE IF NOT EXISTS `product_review` (
   `comment` TEXT NULL DEFAULT NULL,
   `title` VARCHAR(100) NOT NULL,
   `rating` SMALLINT NOT NULL DEFAULT '0',
-  `published` SMALLINT NOT NULL DEFAULT '0',
   `created_date` TIMESTAMP NOT NULL,
   `updated_date` TIMESTAMP NULL DEFAULT NULL,
   PRIMARY KEY (`uuid_product_review`),
@@ -506,10 +838,30 @@ CREATE TABLE IF NOT EXISTS `user_address` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
-
 SHOW WARNINGS;
 CREATE INDEX `uuid_user` ON `user_address` (`uuid_user` ASC) VISIBLE;
+SHOW WARNINGS;
+-- -----------------------------------------------------
+-- Table `default_user_address`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `default_user_address` ;
 
+SHOW WARNINGS;
+CREATE TABLE IF NOT EXISTS `default_user_address` (
+  `uuid_uaddress` VARCHAR(40) NOT NULL,
+  `uuid_user` VARCHAR(40) NOT NULL,
+  PRIMARY KEY (`uuid_user`),
+  CONSTRAINT `default_user_address_ibfk_1`
+    FOREIGN KEY (`uuid_user`)
+    REFERENCES `user` (`uuid_user`),
+  CONSTRAINT `default_user_address_ibfk_2`
+    FOREIGN KEY (`uuid_uaddress`)
+    REFERENCES `user_address` (`uuid_uaddress`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+SHOW WARNINGS;
+CREATE UNIQUE INDEX `uuid_uaddress` ON `default_user_address` (`uuid_uaddress` ASC) VISIBLE;
 SHOW WARNINGS;
 -- -----------------------------------------------------
 -- Table `role`

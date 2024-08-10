@@ -22,6 +22,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AppException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleAppException(AppException exception) {
+        log.error("handleAppException");
         log.error(exception.getMessage());
         return ApiResponse.builder()
                 .errorCode(exception.getErrorCode().getCode())
@@ -33,6 +34,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleMismatchParametersType(MethodArgumentTypeMismatchException exception) {
+        log.error("handleMismatchParametersType");
         String message = "The required type of " +
                 exception.getPropertyName() +
                 " is " +
@@ -48,6 +50,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleParameterNotValid(MethodArgumentNotValidException exception) {
+        log.error("handleParameterNotValid");
         log.error(Objects.requireNonNull(exception.getFieldError()).getDefaultMessage());
         return ApiResponse.builder()
                 .errorCode(ErrorCode.PARAMETER_NOT_VALID.getCode())
@@ -60,6 +63,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleConstraintViolation(ConstraintViolationException exception) {
+        log.error("handleConstraintViolation");
         log.error(exception.getMessage());
         return ApiResponse.builder()
                 .errorCode(ErrorCode.INVALID_PARAMETER_DATA.getCode())
@@ -70,7 +74,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiResponse<?> handleConstraintViolation(MissingServletRequestParameterException exception) {
+    public ApiResponse<?> handleMissingServletRequestParameterException(MissingServletRequestParameterException exception) {
+        log.error("handleMissingServletRequestParameterException");
         log.error(exception.getMessage());
         return ApiResponse.builder()
                 .errorCode(ErrorCode.INVALID_PARAMETER_DATA.getCode())
@@ -82,19 +87,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleNotReadableException(HttpMessageNotReadableException exception) {
-        String message = exception.getRootCause() != null ? exception.getRootCause().getMessage() :
-                ErrorCode.INVALID_DATA_FORMAT.getMessage();
-        log.error(message);
+        log.error("handleNotReadableException");
+        log.error(ErrorCode.INVALID_DATA_FORMAT.getMessage());
         return ApiResponse.builder()
                 .errorCode(ErrorCode.INVALID_DATA_FORMAT.getCode())
                 .statusCode(HttpStatus.BAD_REQUEST.value())
-                .message(message)
+                .message(ErrorCode.INVALID_DATA_FORMAT.getMessage())
                 .build();
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiResponse<?> handleNoResourceFoundException(NoResourceFoundException exception) {
+        log.error("handleNoResourceFoundException");
         log.error(exception.getMessage());
         return ApiResponse.builder()
                 .errorCode(ErrorCode.NO_RESOURCE_FOUND.getCode())
@@ -117,6 +122,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleBadCredentialsException(BadCredentialsException exception) {
+        log.error("handleBadCredentialsException");
         return ApiResponse.builder()
                 .errorCode(ErrorCode.BAD_CREDENTIALS.getCode())
                 .statusCode(HttpStatus.BAD_REQUEST.value())

@@ -14,18 +14,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@IdClass(ProductCategoryId.class)
 public class ProductCategory {
     @Id
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "uuid_product")
-    private Product product;
+    @Column(name = "uuid_product")
+    private String uuidProduct;
 
     @Id
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "uuid_category")
-    private Category category;
+    @Column(name = "uuid_category")
+    private String uuidCategory;
 }
 
 

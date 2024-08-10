@@ -1,6 +1,7 @@
 package org.example.ecommerce.product.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -20,10 +21,8 @@ public class CreateProductRequest {
     private String summary;
 
     @NotNull
-    private int type;
-
-    @NotNull
-    private double price;
+    @Min(value = 1)
+    private Double price;
 
     @NotNull
     private int quantity;

@@ -6,7 +6,7 @@ import org.example.ecommerce.cart.model.CartItem;
 
 @Getter
 @Builder
-public class CartItemResponse {
+public class InvoiceItemResponse {
 
     private String uuidProduct;
 
@@ -14,18 +14,21 @@ public class CartItemResponse {
 
     private double unitPrice;
 
-    private double totalPrice;
+    private double subtotal;
+
+    private double discount;
 
     private double discountPrice;
 
     private int quantity;
 
-    public static CartItemResponse from(CartItem cartItem) {
-        return CartItemResponse.builder()
+    public static InvoiceItemResponse from(CartItem cartItem) {
+        return InvoiceItemResponse.builder()
                 .uuidProduct(cartItem.getUuidProduct())
                 .unitPrice(cartItem.getUnitPrice())
-                .totalPrice(cartItem.getUnitPrice() * cartItem.getQuantity())
-                .discountPrice(cartItem.getDiscount())
+                .subtotal(cartItem.getUnitPrice() * cartItem.getQuantity())
+                .discount(cartItem.getDiscount())
+                .discountPrice(cartItem.getDiscount() * cartItem.getUnitPrice())
                 .quantity(cartItem.getQuantity())
                 .uuidCartItem(cartItem.getUuidCartItem())
                 .build();

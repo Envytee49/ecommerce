@@ -9,6 +9,10 @@ public final class SecurityUtils {
     public static String getCurrentUserCartUuid() {
         return extractPrincipal(getAuthentication()).getClaim("uuidCart");
     }
+
+    public static String getCurrentSellerShopUuid() {
+        return extractPrincipal(getAuthentication()).getClaim("uuidShop");
+    }
     public static String getCurrentUserUuid() {
         return getAuthentication().getName();
     }

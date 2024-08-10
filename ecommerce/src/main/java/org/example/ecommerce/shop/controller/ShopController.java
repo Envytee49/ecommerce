@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.common.ApiResponse;
 import org.example.ecommerce.common.controller.AbstractController;
 import org.example.ecommerce.common.dto.PageDtoIn;
+import org.example.ecommerce.shop.dto.request.CreateShopRequest;
 import org.example.ecommerce.shop.dto.request.RevenueRequest;
 import org.example.ecommerce.shop.service.ShopService;
 import org.springframework.web.bind.annotation.*;
@@ -35,4 +36,10 @@ public class ShopController extends AbstractController {
                                        @RequestParam String sortDirection) {
         return respond(() -> shopService.getTopBuyers(pageDtoIn, sortBy, sortDirection));
     }
+
+    @PostMapping
+    public ApiResponse<?> createShop(CreateShopRequest request) {
+        return respond(() -> shopService.createShop(request), "Shop created");
+    }
+
 }

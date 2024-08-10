@@ -1,6 +1,7 @@
 package org.example.ecommerce.user.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.example.ecommerce.common.constants.Role;
 import org.example.ecommerce.common.dto.PageDtoIn;
 import org.example.ecommerce.common.dto.PageDtoOut;
 import org.example.ecommerce.configuration.security.SecurityUtils;
@@ -14,12 +15,13 @@ import org.example.ecommerce.user.model.User;
 import org.example.ecommerce.user.model.UserRole;
 import org.example.ecommerce.user.repository.UserRepository;
 import org.example.ecommerce.user.service.UserManagementService;
-import org.example.ecommerce.voucher.repository.UserRoleRepository;
+import org.example.ecommerce.user.repository.UserRoleRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -82,6 +84,14 @@ public class UserManagementServiceImpl implements UserManagementService {
         user.setDescription(request.getDescription());
         user.setAvatar(request.getAvatar());
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void updateSellerRole() {
+        String uuidSeller = SecurityUtils.getCurrentUserUuid();
+        UserRole userRole = UserRole.builder().uuidUser(uuidSeller).role(Role.SELLER).build();
+        userRoleRepository.save(userRole);
     }
 
     @Override

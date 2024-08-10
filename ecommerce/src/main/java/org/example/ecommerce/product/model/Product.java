@@ -43,11 +43,6 @@ public class Product extends AbstractEntity {
 
     @NotNull
     @Builder.Default
-    @Column(name = "type")
-    private int type = 0;
-
-    @NotNull
-    @Builder.Default
     @Column(name = "price")
     private double price = 0;
 
@@ -71,10 +66,5 @@ public class Product extends AbstractEntity {
     @Column(name = "uuid_shop")
     private String uuidShop;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductCategory> categories;
-
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductAttribute> attributes;
 }
 

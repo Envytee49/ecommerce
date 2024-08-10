@@ -1,17 +1,17 @@
 package org.example.ecommerce.common.constants;
 
 public enum DiscountType {
-    PERCENTAGE {
+    FIXED {
         @Override
-        public double getDiscount(double discount, double subTotal) {
+        public double getDiscount(double discount, double subTotal, double discountCap) {
             return discount;
         }
-    }, FIXED {
+    }, PERCENTAGE {
         @Override
-        public double getDiscount(double discount, double subTotal) {
-            return subTotal * (1 - discount);
+        public double getDiscount(double discount, double subTotal, double discountCap) {
+            return Math.min(subTotal * discount, discountCap);
         }
     };
 
-    public abstract double getDiscount(double discount, double subTotal);
+    public abstract double getDiscount(double discount, double subTotal, double discountCap);
 }

@@ -7,6 +7,7 @@ import org.example.ecommerce.user.model.UserAddress;
 @Builder
 @Getter
 public class DeliveryInfo {
+    private String uuidUAddress;
     private String mobile;
     private String city;
     private String street;
@@ -15,6 +16,7 @@ public class DeliveryInfo {
 
     public static DeliveryInfo from(UserAddress userAddress) {
         return DeliveryInfo.builder()
+                .uuidUAddress(userAddress.getUuidUAddress())
                 .district(userAddress.getDistrict())
                 .city(userAddress.getCity())
                 .street(userAddress.getStreet())

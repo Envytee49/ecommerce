@@ -1,5 +1,6 @@
 package org.example.ecommerce.order.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,12 +12,16 @@ import java.util.Objects;
 @Getter
 @Setter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShopOrder {
     private String uuidOrder;
     private String uuidShop;
     private String shopName;
-    private Double shippingFee;
-    private Double totalPrice;
+    private Double merchandiseSubtotal;
+    private Double shippingSubtotal;
+    private Double shippingDiscountSubtotal;
+    private Double voucherDiscount;
+    private Double totalPayment;
     private List<OrderItem> orderItems;
     @Override
     public boolean equals(Object o) {

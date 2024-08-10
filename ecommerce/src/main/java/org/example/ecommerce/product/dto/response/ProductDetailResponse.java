@@ -1,5 +1,6 @@
 package org.example.ecommerce.product.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.ecommerce.product.model.Product;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 @Builder
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDetailResponse {
     private String uuidProduct;
 
@@ -30,12 +32,12 @@ public class ProductDetailResponse {
     private LocalDateTime publishedDate;
 
 
-    private Map<String, String> attributes;
+    private List<ProductVariantResponse> productVariants;
 
     private List<CategoryResponse> categories;
 
     public static ProductDetailResponse from(Product product,
-                                             Map<String, String> attributes,
+                                             List<ProductVariantResponse> productVariants,
                                              List<CategoryResponse> categories) {
         return ProductDetailResponse.builder()
                 .uuidProduct(product.getUuidProduct())
@@ -46,8 +48,7 @@ public class ProductDetailResponse {
                 .quantity(product.getQuantity())
                 .summary(product.getSummary())
                 .description(product.getDescription())
-                .type(product.getType())
-                .attributes(attributes)
+                .productVariants(productVariants)
                 .categories(categories)
                 .build();
     }

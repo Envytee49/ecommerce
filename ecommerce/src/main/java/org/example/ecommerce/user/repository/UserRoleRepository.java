@@ -1,4 +1,4 @@
-package org.example.ecommerce.voucher.repository;
+package org.example.ecommerce.user.repository;
 
 import org.example.ecommerce.user.model.UserRole;
 import org.example.ecommerce.user.model.UserRoleId;

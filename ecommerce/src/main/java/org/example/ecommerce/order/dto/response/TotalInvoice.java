@@ -1,5 +1,6 @@
 package org.example.ecommerce.order.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 @Getter
@@ -7,15 +8,21 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TotalInvoice {
-    private double subTotal;
-    private double totalAmount;
-    private double discount;
-    private double shipping;
+    private double merchandiseSubTotal;
+    private double shippingSubtotal;
+    private double shippingDiscountSubtotal;
+    private double voucherDiscount;
+    private double totalPayment;
 
-    public void updateInvoice(double shipping, double subTotal, double discount, double totalAmount) {
-        this.shipping += shipping;
-        this.subTotal += subTotal;
-        this.discount += discount;
-        this.totalAmount += totalAmount;
+    public void updateInvoice(double merchandiseSubTotal,
+                              double shippingSubtotal,
+                              double shippingDiscountSubtotal,
+                              double voucherDiscount,
+                              double totalPayment) {
+        this.merchandiseSubTotal += merchandiseSubTotal;
+        this.shippingSubtotal += shippingSubtotal;
+        this.shippingDiscountSubtotal += shippingDiscountSubtotal;
+        this.voucherDiscount += voucherDiscount;
+        this.totalPayment += totalPayment;
     }
 }

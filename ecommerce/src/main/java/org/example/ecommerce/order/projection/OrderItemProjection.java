@@ -9,6 +9,9 @@ public interface OrderItemProjection {
     int getQuantity();
     double getOriginalPrice();
     double getDiscountPrice();
-    double getShippingFee();
-    double getTotalPrice();
+    double getMerchandiseSubtotal();
+    double getShippingSubtotal();
+    Double getShippingDiscountSubtotal();
+    Double getVoucherDiscount();
+    double getTotalPayment();
 }

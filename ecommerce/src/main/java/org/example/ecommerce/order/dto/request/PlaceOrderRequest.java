@@ -3,6 +3,7 @@ package org.example.ecommerce.order.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.ecommerce.cart.model.CartItem;
@@ -21,6 +22,7 @@ public class PlaceOrderRequest {
     private PaymentMethod paymentMethod;
     @NotEmpty(message = "Please pick at least 1 cart item")
     private List<String> uuidCartItems;
-    @NotNull(message = "shopVouchers must not be null")
     private Map<String, String> shopVouchers;
+    private String discountCashbackVoucher;
+    private String freeShippingVoucher;
 }

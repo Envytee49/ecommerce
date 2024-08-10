@@ -10,4 +10,6 @@ public interface OrderService {
     void placeOrder(PlaceOrderRequest request);
     OrderHistoryResponse getOrderHistory(FetchOrderRequest request);
     OrderItemDetailResponse getOrderDetails(FetchOrderDetailRequest request);
+
+    void changeAddress(String uuidUAddress);
 }

@@ -33,6 +33,9 @@ public class OrderItem extends AbstractEntity {
     @Column(name = "uuid_product")
     private String uuidProduct;
 
+    @Column(name = "uuid_sku")
+    private String uuidSku;
+
     @NotNull
     @Size(max = 40)
     @Column(name = "uuid_order")
@@ -53,7 +56,4 @@ public class OrderItem extends AbstractEntity {
     @Builder.Default
     @Column(name = "quantity")
     private double quantity = 0;
-    @JsonIgnore
-    @Column(name = "content")
-    private String content;
 }

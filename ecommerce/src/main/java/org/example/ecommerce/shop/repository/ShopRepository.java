@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface ShopRepository extends JpaRepository<Shop, String> {
     Shop findByUuidSeller(String uuidSeller);
     // order -> shop id = current seller shop id
@@ -26,4 +28,7 @@ public interface ShopRepository extends JpaRepository<Shop, String> {
             "WHERE o.uuid_shop = :uuidShop " +
             "GROUP BY u.uuid_user", nativeQuery = true)
     Page<TBProjection> findTopBuyers(@Param("uuidShop") String uuidShop, Pageable pageable);
+
+    @Query(value = "SELECT s.name FROM Shop s WHERE s.name = :name")
+    Optional<String> findByName(String name);
 }

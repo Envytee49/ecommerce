@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.ecommerce.common.util.Utils;
@@ -29,4 +30,16 @@ public class ShopAddress extends AbstractAddress {
     @Size(max = 30)
     @Column(name = "seller_name")
     private String sellerName;
+
+    @Builder
+    public ShopAddress(@Size(max = 15) String mobile, @Size(max = 255) String city, @Size(max = 255) String street, @Size(max = 255) String district, Integer postalCode, String uuidSAddress, String uuidShop, String sellerName) {
+        super(mobile, city, street, district, postalCode);
+        this.uuidSAddress = uuidSAddress;
+        this.uuidShop = uuidShop;
+        this.sellerName = sellerName;
+    }
+
+    public ShopAddress() {
+        super();
+    }
 }

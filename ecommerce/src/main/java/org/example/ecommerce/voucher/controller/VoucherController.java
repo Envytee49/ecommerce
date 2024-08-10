@@ -18,7 +18,17 @@ public class VoucherController extends AbstractController {
     public ApiResponse<?> getShopVouchers(@Valid @RequestBody FetchVoucherRequest request) {
         return respond(() -> voucherService.getShopVouchers(request));
     }
-    @GetMapping("/redeem/{uuidVoucher}")
+
+    @GetMapping("/info/free-shipping")
+    public ApiResponse<?> getFreeShippingVouchers() {
+        return respond(() -> voucherService.getFreeShippingVouchers());
+    }
+
+    @GetMapping("/info/discount-cashback")
+    public ApiResponse<?> getDiscountCashbackVouchers() {
+        return respond(() -> voucherService.getDiscountCashbackVouchers());
+    }
+    @PostMapping("/redeem/{uuidVoucher}")
     @PreAuthorize("hasRole('USER')")
     public ApiResponse<?> redeemVoucher(@PathVariable String uuidVoucher) {
         return respond(() -> voucherService.redeemVoucher(uuidVoucher), "Voucher redeemed successfully");

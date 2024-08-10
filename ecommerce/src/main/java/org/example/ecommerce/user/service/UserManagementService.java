@@ -12,5 +12,7 @@ public interface UserManagementService {
     void deleteUser(String userUuid);
     void createUser(CreateUserRequest request);
     void updateUser(String uuidUser, UpdateUserRequest request);
+
+    void updateSellerRole();
     UserDetailResponse getUserByUuid(String userUuid);
 }

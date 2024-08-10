@@ -1,5 +1,6 @@
 package org.example.ecommerce.common.util;
 
+import org.example.ecommerce.cart.model.CartItem;
 import org.example.ecommerce.exception.AppException;
 import org.example.ecommerce.exception.ErrorCode;
 import org.springframework.data.domain.Sort;
@@ -18,7 +19,19 @@ public class Utils {
         }
     }
 
-    public static   <E extends Enum<E>> Sort getSortStrategy(List<String> sortBy, Class<E> sortByEnum, String sortDirection) {
+    /**
+     * get T 'thirty' S 'six' Uuid
+     */
+    public static String getTSUuid() {
+        String uuidString = UUID.randomUUID().toString();
+        if (uuidString.length() > 36) {
+            return uuidString.substring(0, 36);
+        } else {
+            return uuidString;
+        }
+    }
+
+    public static <E extends Enum<E>> Sort getSortStrategy(List<String> sortBy, Class<E> sortByEnum, String sortDirection) {
         checkEnumNotContainsValues(sortBy, sortByEnum);
         checkEnumNotContainsValue(sortDirection, Sort.Direction.class, "sortDirection");
         return Sort.by(Sort.Direction.fromString(sortDirection), sortBy.toArray(new String[0]));
@@ -41,5 +54,18 @@ public class Utils {
                                     Arrays.toString(enumType.getEnumConstants()))
             );
         }
+    }
+
+    public static double computeCartItemSubTotal(List<CartItem> cartItems) {
+        if (cartItems == null) {
+            return 0;
+        }
+
+        return cartItems.stream()
+                .mapToDouble(cartItem -> {
+                    double discountMultiplier = cartItem.getDiscount() == 0 ? 1 : cartItem.getDiscount();
+                    return cartItem.getQuantity() * cartItem.getUnitPrice() * discountMultiplier;
+                })
+                .sum();
     }
 }

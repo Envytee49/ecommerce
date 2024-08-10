@@ -28,15 +28,12 @@ public class CartItem extends AbstractEntity {
     @Column(name = "uuid_cart")
     private String uuidCart;
 
-    @Builder.Default
     @Size(max = 40)
     @Column(name = "uuid_product")
-    private String uuidProduct = null;
+    private String uuidProduct;
 
-    @Builder.Default
-    @Size(max = 40)
-    @Column(name = "uuid_shop")
-    private String uuidShop = null;
+    @Column(name = "uuid_sku")
+    private String uuidSku;
 
     @Builder.Default
     @NotNull
@@ -58,8 +55,6 @@ public class CartItem extends AbstractEntity {
     @Column(name = "active")
     private int active = 0;
 
-    @Column(name = "content")
-    private String content;
 
 }
 

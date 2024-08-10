@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 public interface VoucherRedemptionRepository extends JpaRepository<VoucherRedemption, VoucherRedemptionId> {
 
-    List<VoucherRedemption> findByUuidVoucherIn(List<String> uuidVouchers);
+    List<VoucherRedemption> findByUuidVoucherInAndUuidUser(List<String> uuidVouchers, String uuidUser);
 }

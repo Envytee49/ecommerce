@@ -21,8 +21,9 @@ import java.time.LocalDateTime;
 public class VoucherConstraint {
     @Id
     @Size(max = 40)
-    @Column(name = "uuid_voucher")
-    private String uuidVoucher;
+    @Column(name = "uuid_voucher_constraint")
+    @Builder.Default
+    private String uuidVoucherConstraint = Utils.getUuid();
     @Column(name = "minimum_spend")
     private double minSpend;
     @Column(name = "max_usage")

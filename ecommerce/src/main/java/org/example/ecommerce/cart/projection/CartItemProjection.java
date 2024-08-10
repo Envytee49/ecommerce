@@ -1,8 +1,25 @@
 package org.example.ecommerce.cart.projection;
 
-import org.example.ecommerce.cart.model.CartItem;
-
 public interface CartItemProjection {
-    CartItem getCartItem();
+    String getTitle();
+
+    String getUuidCartItem();
+
+    String getUuidProduct();
+
+    String getUuidSku();
+
+    String getProductVariantOptions();
+
+    double getUnitPrice();
+
+    double getDiscount();
+
+    int getQuantity();
+
+    int getActive();
+
     String getUuidShop();
+
+    String getShopName();
 }

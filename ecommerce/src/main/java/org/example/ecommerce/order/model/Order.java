@@ -43,23 +43,28 @@ public class Order extends AbstractEntity {
 
     @NotNull
     @Builder.Default
-    @Column(name = "subtotal")
-    private double subtotal = 0;
+    @Column(name = "merchandise_subtotal")
+    private double merchandiseSubtotal = 0;
 
     @NotNull
     @Builder.Default
-    @Column(name = "shipping")
-    private double shipping = 0;
+    @Column(name = "shipping_subtotal")
+    private double shippingSubtotal = 0;
 
     @NotNull
     @Builder.Default
-    @Column(name = "total")
-    private double total = 0;
+    @Column(name = "shipping_discount_subtotal")
+    private double shippingDiscountSubtotal = 0;
 
     @NotNull
     @Builder.Default
-    @Column(name = "discount")
-    private double discount = 0;
+    @Column(name = "voucherDiscount")
+    private double voucherDiscount = 0;
+
+    @NotNull
+    @Builder.Default
+    @Column(name = "total_payment")
+    private double totalPayment = 0;
 
     @Column(name = "payment_method")
     @Enumerated(EnumType.STRING)

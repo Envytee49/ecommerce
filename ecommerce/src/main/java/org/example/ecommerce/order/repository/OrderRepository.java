@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, String> {
     // product p  productName, uuidShop
@@ -21,7 +22,10 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT p.title as productTitle, p.uuidShop as uuidShop, " +
             "s.name as shopName, " +
             "oi.uuidProduct as uuidProduct, oi.quantity as quantity, oi.price as originalPrice, oi.discount as discountPrice, " +
-            "o.shipping as shippingFee, o.total as totalPrice, o.uuidOrder as uuidOrder " +
+            "o.shippingDiscountSubtotal as shippingDiscountSubtotal, " +
+            "o.shippingSubtotal as shippingSubtotal, " +
+            "o.totalPayment as totalPayment, " +
+            "o.uuidOrder as uuidOrder " +
             "FROM OrderItem oi " +
             "INNER JOIN Product p ON oi.uuidProduct = p.uuidProduct " +
             "INNER JOIN Order o ON oi.uuidOrder = o.uuidOrder " +
@@ -37,15 +41,22 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     @Query(value = "SELECT p.title as productTitle, p.uuidShop as uuidShop, " +
             "s.name as shopName, " +
             "oi.uuidProduct as uuidProduct, oi.quantity as quantity, oi.price as originalPrice, oi.discount as discountPrice, " +
-            "o.shipping as shippingFee, o.total as totalPrice, o.uuidOrder as uuidOrder, o.uuidUAddress as uuidUAddress " +
+            "o.merchandiseSubtotal as merchandiseSubtotal, " +
+            "o.shippingSubtotal as shippingSubtotal, " +
+            "o.shippingDiscountSubtotal as shippingDiscountSubtotal, " +
+            "o.voucherDiscount as voucherDiscount, " +
+            "o.totalPayment as totalPayment, " +
+            "o.uuidOrder as uuidOrder, o.uuidUAddress as uuidUAddress " +
             "FROM OrderItem oi " +
             "INNER JOIN Product p ON oi.uuidProduct = p.uuidProduct " +
             "INNER JOIN Order o ON oi.uuidOrder = o.uuidOrder " +
             "INNER join Shop s ON s.uuidShop = p.uuidShop " +
-            "WHERE o.uuidOrder = :uuidOrder AND s.uuidShop = :uuidShop")
+            "WHERE o.uuidOrder = :uuidOrder AND s.uuidShop = :uuidShop AND o.uuidUser = :uuidUser")
     List<OrderItemProjection> findOrderDetail(@Param("uuidOrder") String uuidOrder,
-                                        @Param("uuidShop") String uuidShop);
+                                        @Param("uuidShop") String uuidShop,
+                                              String uuidUser);
 
     Page<Order> findByUuidShopAndCreatedDateBetween(String uuidShop, LocalDateTime start, LocalDateTime end, Pageable pageable);
 
+    Optional<Order> findByUuidOrderAndUuidShop(String uuidOrder, String currentSellerShopUuid);
 }

@@ -11,10 +11,8 @@ import org.example.ecommerce.order.dto.request.FetchOrderDetailRequest;
 import org.example.ecommerce.order.dto.request.FetchOrderRequest;
 import org.example.ecommerce.order.dto.request.PlaceOrderRequest;
 import org.example.ecommerce.order.dto.response.*;
-import org.example.ecommerce.order.dto.response.InvoiceDetailResponse;
 import org.example.ecommerce.order.model.Order;
 import org.example.ecommerce.order.model.OrderItem;
-import org.example.ecommerce.cart.projection.CartItemProjection;
 import org.example.ecommerce.order.projection.OrderItemProjection;
 import org.example.ecommerce.order.repository.OrderItemRepository;
 import org.example.ecommerce.order.repository.OrderRepository;
@@ -22,8 +20,8 @@ import org.example.ecommerce.order.service.InvoiceService;
 import org.example.ecommerce.order.service.OrderService;
 import org.example.ecommerce.user.model.UserAddress;
 import org.example.ecommerce.user.repository.UserAddressRepository;
-import org.example.ecommerce.voucher.model.VoucherRedemption;
-import org.example.ecommerce.voucher.repository.VoucherRedemptionRepository;
+import org.example.ecommerce.user.service.UserInfoService;
+import org.example.ecommerce.user.service.impl.UserInfoServiceImpl;
 import org.example.ecommerce.voucher.service.VoucherService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +31,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
@@ -40,23 +39,22 @@ public class OrderServiceImpl implements OrderService {
     private final OrderItemRepository orderItemRepository;
     private final InvoiceService invoiceService;
     private final VoucherService voucherService;
+    private final UserInfoService userInfoService;
+
     @Override
     @Transactional
     public void placeOrder(PlaceOrderRequest request) {
         // check address existed
-        String uuidAddress = request.getUuidUAddress();
-        if (userAddressRepository.findById(uuidAddress).isEmpty())
+        String uuidUAddress = request.getUuidUAddress();
+        if (userAddressRepository.findByUuidUAddressAndUuidUser(uuidUAddress, SecurityUtils.getCurrentUserUuid()).isEmpty())
             throw new AppException(ErrorCode.ADDRESS_NOT_FOUND);
-        // selected cart items
-        List<String> uuidCartItems = request.getUuidCartItems();
-        List<CartItem> cartItems = cartRepository.findAllById(uuidCartItems);
-        if (cartItems.size() != uuidCartItems.size())
-            throw new AppException(ErrorCode.CART_ITEM_NOT_FOUND);
-
         // amounts
         List<InvoiceDetailResponse> invoiceDetailResponses =
-                invoiceService.getInvoiceDetails(request.getShopVouchers(), cartItems);
-
+                invoiceService.getInvoiceDetails(request.getShopVouchers(),
+                        request.getUuidCartItems(),
+                        request.getUuidUAddress(),
+                        request.getFreeShippingVoucher(),
+                        request.getDiscountCashbackVoucher());
         // update voucher usage
         List<String> uuidVouchers =
                 request.getShopVouchers().values().stream().toList();
@@ -67,10 +65,11 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = new ArrayList<>();
         for(InvoiceDetailResponse invoiceDetailResponse : invoiceDetailResponses) {
             Order order = Order.builder()
-                    .subtotal(invoiceDetailResponse.getSubTotal())
-                    .shipping(invoiceDetailResponse.getShipping())
-                    .total(invoiceDetailResponse.getTotalAmount())
-                    .discount(invoiceDetailResponse.getDiscount())
+                    .merchandiseSubtotal(invoiceDetailResponse.getMerchandiseSubTotal())
+                    .shippingSubtotal(invoiceDetailResponse.getShippingSubtotal())
+                    .shippingDiscountSubtotal(invoiceDetailResponse.getShippingDiscountSubtotal())
+                    .voucherDiscount(invoiceDetailResponse.getVoucherDiscount())
+                    .totalPayment(invoiceDetailResponse.getTotalPayment())
                     .uuidShop(invoiceDetailResponse.getUuidShop())
                     .note(request.getNote())
                     .uuidUAddress(request.getUuidUAddress())
@@ -88,6 +87,7 @@ public class OrderServiceImpl implements OrderService {
                             .price(cartItem.getUnitPrice())
                             .discount(cartItem.getDiscountPrice())
                             .uuidProduct(cartItem.getUuidProduct())
+                            .uuidSku(cartItem.getUuidSku())
                             .build()
                     )
                     .toList());
@@ -102,23 +102,24 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemProjection> orderItemProjections = orderRepository
                 .findOrderHistory(SecurityUtils.getCurrentUserUuid(), request.getStatus());
         List<ShopOrder> orderItems = new ArrayList<>();
-        for(OrderItemProjection orderItemProjection : orderItemProjections) {
+        for(OrderItemProjection o : orderItemProjections) {
             ShopOrder shopOrder = ShopOrder.builder()
-                    .uuidOrder(orderItemProjection.getUuidOrder())
-                    .uuidShop(orderItemProjection.getUuidShop())
+                    .uuidOrder(o.getUuidOrder())
+                    .uuidShop(o.getUuidShop())
                     .build();
             if(!orderItems.contains(shopOrder)) {
-                shopOrder.setShopName(orderItemProjection.getShopName());
-                shopOrder.setShippingFee(orderItemProjection.getShippingFee());
-                shopOrder.setTotalPrice(orderItemProjection.getTotalPrice());
+                shopOrder.setShopName(o.getShopName());
+                shopOrder.setShippingSubtotal(o.getShippingSubtotal());
+                shopOrder.setShippingDiscountSubtotal(o.getShippingDiscountSubtotal());
+                shopOrder.setTotalPayment(o.getTotalPayment());
                 shopOrder.setOrderItems(new ArrayList<>());
                 orderItems.add(shopOrder);
             }
             orderItems.get(orderItems.indexOf(shopOrder)).updateOrderItemList(OrderItem.builder()
-                            .quantity(orderItemProjection.getQuantity())
-                            .price(orderItemProjection.getOriginalPrice())
-                            .discount(orderItemProjection.getDiscountPrice())
-                            .uuidProduct(orderItemProjection.getUuidProduct())
+                            .quantity(o.getQuantity())
+                            .price(o.getOriginalPrice())
+                            .discount(o.getDiscountPrice())
+                            .uuidProduct(o.getUuidProduct())
                     .build());
         }
         return OrderHistoryResponse.builder().orderItems(orderItems).build();
@@ -127,9 +128,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderItemDetailResponse getOrderDetails(FetchOrderDetailRequest request) {
         List<OrderItemProjection> orderItemProjections =
-                orderRepository.findOrderDetail(request.getUuidOrder(), request.getUuidShop());
+                orderRepository.findOrderDetail(request.getUuidOrder(),
+                        request.getUuidShop(),
+                        SecurityUtils.getCurrentUserUuid());
+        if(orderItemProjections.isEmpty())
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+
         UserAddress userAddress = userAddressRepository.findById(orderItemProjections.get(0).getUuidUAddress())
                 .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
+
         DeliveryInfo deliveryInfo = DeliveryInfo.from(userAddress);
         List<OrderItem> orderItems = orderItemProjections
                 .stream()
@@ -141,18 +148,28 @@ public class OrderServiceImpl implements OrderService {
                         .uuidProduct(orderItemProjection.getUuidProduct())
                         .build())
                 .toList();
+        OrderItemProjection orderItem = orderItemProjections.get(0);
         ShopOrder shopOrder = ShopOrder.builder()
-                .uuidOrder(orderItemProjections.get(0).getUuidOrder())
-                .uuidShop(orderItemProjections.get(0).getUuidShop())
-                .shippingFee(orderItemProjections.get(0).getShippingFee())
-                .totalPrice(orderItemProjections.get(0).getTotalPrice())
-                .shopName(orderItemProjections.get(0).getShopName())
+                .uuidOrder(orderItem.getUuidOrder())
+                .uuidShop(orderItem.getUuidShop())
+                .merchandiseSubtotal(orderItem.getMerchandiseSubtotal())
+                .shippingSubtotal(orderItem.getShippingSubtotal())
+                .shippingDiscountSubtotal(orderItem.getShippingDiscountSubtotal())
+                .voucherDiscount(orderItem.getVoucherDiscount())
+                .totalPayment(orderItem.getTotalPayment())
+                .shopName(orderItem.getShopName())
                 .orderItems(orderItems)
                 .build();
 
         return OrderItemDetailResponse.builder()
                 .deliveryInfo(deliveryInfo)
                 .orderItem(shopOrder).build();
+    }
+
+    @Override
+    @Transactional
+    public void changeAddress(String uuidUAddress) {
+        userInfoService.changeDefaultAddress(uuidUAddress);
     }
 
 }

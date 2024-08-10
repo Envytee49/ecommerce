@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.ecommerce.common.constants.DiscountType;
-import org.example.ecommerce.common.constants.VoucherType;
 
 import java.time.LocalDateTime;
 
@@ -16,8 +15,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CreateVoucherRequest {
-    @NotBlank
-    private String voucherName;
     @NotNull
     private DiscountType discountType;
     @NotBlank
@@ -26,9 +23,13 @@ public class CreateVoucherRequest {
     @Min(value = 1)
     @NotNull
     private Integer quantity;
+    @Min(value = 1)
+    private Double discountValue;
     @Min(value = 0)
+    private Integer discountPercentage;
     @NotNull
-    private Double discount;
+    @Min(value = 1)
+    private Double discountCap;
     @NotBlank
     private String description;
     @Min(value = 1)

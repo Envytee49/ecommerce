@@ -15,8 +15,8 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
     Category findByTitle(String title);
     @Query(value =
             "SELECT new org.example.ecommerce.product.dto.response.CategoryResponse(c.uuidCategory, c.title) " +
-                    "FROM Category c INNER JOIN ProductCategory pc ON c.uuidCategory = pc.category.uuidCategory " +
-                    "INNER JOIN Product p ON pc.product.uuidProduct = p.uuidProduct " +
+                    "FROM Category c INNER JOIN ProductCategory pc ON c.uuidCategory = pc.uuidCategory " +
+                    "INNER JOIN Product p ON pc.uuidProduct = p.uuidProduct " +
                     "WHERE p.uuidProduct = :uuidProduct")
     List<CategoryResponse> findByUuidProduct(@Param("uuidProduct") String uuidProduct);
 }

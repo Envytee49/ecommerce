@@ -8,8 +8,10 @@ import org.example.ecommerce.user.dto.request.ChangePasswordRequest;
 import org.example.ecommerce.user.dto.request.UpdateProfileRequest;
 import org.example.ecommerce.user.dto.response.UserAddressDetail;
 import org.example.ecommerce.user.dto.response.UserAddressResponse;
+import org.example.ecommerce.user.model.DefaultUserAddress;
 import org.example.ecommerce.user.model.User;
 import org.example.ecommerce.user.model.UserAddress;
+import org.example.ecommerce.user.repository.DefaultUserAddressRepository;
 import org.example.ecommerce.user.repository.UserAddressRepository;
 import org.example.ecommerce.user.repository.UserRepository;
 import org.example.ecommerce.user.service.UserInfoService;
@@ -24,6 +26,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final UserRepository userRepository;
     private final UserAddressRepository userAddressRepository;
     private final PasswordEncoder passwordEncoder;
+    private final DefaultUserAddressRepository defaultUserAddressRepository;
 
     @Override
     public void updateProfile(UpdateProfileRequest request) {
@@ -33,6 +36,17 @@ public class UserInfoServiceImpl implements UserInfoService {
         user.setDescription(request.getDescription());
         user.setAvatar(request.getAvatar());
         userRepository.save(user);
+    }
+
+    @Override
+    public void changeDefaultAddress(String uuidUAddress) {
+        userAddressRepository.findByUuidUAddressAndUuidUser(uuidUAddress, SecurityUtils.getCurrentUserUuid())
+                .orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
+        DefaultUserAddress defaultUserAddress = defaultUserAddressRepository
+                .findById(SecurityUtils.getCurrentUserUuid())
+                .get();
+        defaultUserAddress.setUuidUAddress(uuidUAddress);
+        defaultUserAddressRepository.save(defaultUserAddress);
     }
 
     @Override

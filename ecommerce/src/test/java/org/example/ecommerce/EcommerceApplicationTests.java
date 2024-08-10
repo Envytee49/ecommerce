@@ -2,7 +2,7 @@ package org.example.ecommerce;
 
 import org.example.ecommerce.common.constants.DiscountType;
 import org.example.ecommerce.common.constants.Role;
-import org.example.ecommerce.common.constants.VoucherType;
+import org.example.ecommerce.common.constants.ShopVoucherType;
 import org.example.ecommerce.order.model.CancelledOrderReason;
 import org.example.ecommerce.order.repository.CancelledOrderReasonRepository;
 import org.example.ecommerce.product.model.*;
@@ -13,15 +13,17 @@ import org.example.ecommerce.shop.model.Shop;
 import org.example.ecommerce.shop.model.ShopAddress;
 import org.example.ecommerce.shop.repository.ShopAddressRepository;
 import org.example.ecommerce.shop.repository.ShopRepository;
-import org.example.ecommerce.user.model.*;
-import org.example.ecommerce.user.repository.*;
+import org.example.ecommerce.user.model.User;
+import org.example.ecommerce.user.model.UserAddress;
+import org.example.ecommerce.user.model.UserRole;
+import org.example.ecommerce.user.repository.UserAddressRepository;
+import org.example.ecommerce.user.repository.UserRepository;
+import org.example.ecommerce.user.repository.UserRoleRepository;
 import org.example.ecommerce.voucher.model.ProductVoucher;
-import org.example.ecommerce.voucher.model.Voucher;
+import org.example.ecommerce.voucher.model.ShopVoucher;
 import org.example.ecommerce.voucher.model.VoucherConstraint;
-import org.example.ecommerce.voucher.repository.VoucherConstraintRepository;
-import org.example.ecommerce.voucher.repository.ProductVoucherRepository;
-import org.example.ecommerce.voucher.repository.UserRoleRepository;
-import org.example.ecommerce.voucher.repository.VoucherRepository;
+import org.example.ecommerce.voucher.model.VoucherInfo;
+import org.example.ecommerce.voucher.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,7 +46,7 @@ class EcommerceApplicationTests {
     @Autowired
     private AttributeRepository attributeRepository;
     @Autowired
-    private VoucherRepository voucherRepository;
+    private ShopVoucherRepository shopVoucherRepository;
     @Autowired
     private UserAddressRepository userAddressRepository;
     @Autowired
@@ -59,6 +61,8 @@ class EcommerceApplicationTests {
     private UserRoleRepository userRoleRepository;
     @Autowired
     private CancelledOrderReasonRepository cancelledOrderReasonRepository;
+    @Autowired
+    private VoucherInfoRepository voucherInfoRepository;
 
     @Test
     public void addUser() {
@@ -291,48 +295,58 @@ class EcommerceApplicationTests {
 
         String sellerId2 = userRepository.findByEmail("seller2@example.com").get().getUuidUser();
         String shopId2 = shopRepository.findByUuidSeller(sellerId2).getUuidShop();
-
-        var v1 = Voucher.builder()
+        var vf1 = VoucherInfo.builder()
                 .voucherCode("SPPMKPEU0325")
-                .voucherName("10% Off")
-                .voucherType(VoucherType.PRODUCTS)
                 .discountType(DiscountType.PERCENTAGE)
                 .discount(0.1)
+                .maxDiscount(200.0)
                 .description("Use this voucher to get discount")
                 .quantity(2)
-                .uuidShop(shopId1)
                 .build();
-        var v2 = Voucher.builder()
+        var v1 = ShopVoucher.builder()
+                .shopVoucherType(ShopVoucherType.PRODUCTS)
+                .uuidShop(shopId1)
+                .uuidVoucherInfo(vf1.getUuidVoucherInfo())
+                .build();
+        var vf2 = VoucherInfo.builder()
                 .voucherCode("SPPMKPEU0327")
+                .maxDiscount(200.0)
                 .discountType(DiscountType.PERCENTAGE)
-                .voucherType(VoucherType.PRODUCTS)
-                .voucherName("5% Off")
                 .discount(0.05)
                 .description("Use this voucher to get discount")
-                .uuidShop(shopId2)
                 .quantity(2)
                 .build();
-        var v3 = Voucher.builder()
+        var v2 = ShopVoucher.builder()
+                .shopVoucherType(ShopVoucherType.PRODUCTS)
+                .uuidShop(shopId2)
+                .uuidVoucherInfo(vf2.getUuidVoucherInfo())
+                .build();
+        var vf3 = VoucherInfo.builder()
                 .voucherCode("SPPMKPEU2141")
-                .voucherName("DISCOUNT 10$ Off")
                 .discountType(DiscountType.FIXED)
-                .voucherType(VoucherType.ALL_SHOP)
                 .discount(10.0)
                 .description("Use this voucher to get discount")
                 .quantity(2)
-                .uuidShop(shopId1)
                 .build();
-        var v4 = Voucher.builder()
+        var v3 = ShopVoucher.builder()
+                .shopVoucherType(ShopVoucherType.ALL_SHOP)
+                .uuidShop(shopId1)
+                .uuidVoucherInfo(vf3.getUuidVoucherInfo())
+                .build();
+        var vf4 = VoucherInfo.builder()
                 .voucherCode("SPPMKPEU0324")
-                .voucherName("DISCOUNT 30$ Off")
                 .discountType(DiscountType.FIXED)
-                .voucherType(VoucherType.ALL_SHOP)
                 .discount(30.0)
                 .description("Use this voucher to get discount")
                 .quantity(2)
-                .uuidShop(shopId2)
                 .build();
-        voucherRepository.saveAll(List.of(v1, v2, v3, v4));
+        var v4 = ShopVoucher.builder()
+                .shopVoucherType(ShopVoucherType.ALL_SHOP)
+                .uuidShop(shopId2)
+                .uuidVoucherInfo(vf4.getUuidVoucherInfo())
+                .build();
+        shopVoucherRepository.saveAll(List.of(v1, v2, v3, v4));
+        voucherInfoRepository.saveAll(List.of(vf1, vf2, vf3, vf4));
         var pv1 = ProductVoucher.builder()
                 .uuidVoucher(v1.getUuidVoucher())
                 .uuidProduct(productRepository.findByTitle("nike 1").getUuidProduct())

@@ -1,8 +1,8 @@
 package org.example.ecommerce.voucher.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.ecommerce.cart.repository.CartRepository;
-import org.example.ecommerce.common.constants.VoucherType;
+import org.example.ecommerce.common.constants.PlatformVoucherType;
+import org.example.ecommerce.common.constants.ShopVoucherType;
 import org.example.ecommerce.configuration.security.SecurityUtils;
 import org.example.ecommerce.exception.AppException;
 import org.example.ecommerce.exception.ErrorCode;
@@ -10,17 +10,18 @@ import org.example.ecommerce.product.model.Product;
 import org.example.ecommerce.product.repository.ProductRepository;
 import org.example.ecommerce.shop.repository.ShopRepository;
 import org.example.ecommerce.user.repository.UserRepository;
+import org.example.ecommerce.voucher.aop.VoucherInfoValidation;
+import org.example.ecommerce.voucher.dto.request.CreatePlatformVoucherRequest;
 import org.example.ecommerce.voucher.dto.request.CreateProductVoucherRequest;
 import org.example.ecommerce.voucher.dto.request.CreateVoucherRequest;
 import org.example.ecommerce.voucher.dto.request.VoucherDistributionRequest;
 import org.example.ecommerce.voucher.model.*;
 import org.example.ecommerce.voucher.projection.VoucherConstraintProjection;
-import org.example.ecommerce.voucher.repository.ProductVoucherRepository;
-import org.example.ecommerce.voucher.repository.VoucherConstraintRepository;
-import org.example.ecommerce.voucher.repository.VoucherRedemptionRepository;
-import org.example.ecommerce.voucher.repository.VoucherRepository;
+import org.example.ecommerce.voucher.repository.*;
 import org.example.ecommerce.voucher.service.VoucherManagementService;
 import org.example.ecommerce.voucher.service.VoucherRedemptionService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,87 +31,111 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class VoucherManagementServiceImpl implements VoucherManagementService {
-    private final VoucherRepository voucherRepository;
+    private static final Logger log = LoggerFactory.getLogger(VoucherManagementServiceImpl.class);
+    private final ShopVoucherRepository shopVoucherRepository;
     private final ProductVoucherRepository productVoucherRepository;
     private final ShopRepository shopRepository;
     private final VoucherConstraintRepository voucherConstraintRepository;
     private final ProductRepository productRepository;
     private final VoucherRedemptionService voucherRedemptionService;
-    private final VoucherRedemptionRepository voucherRedemptionRepository;
+    private final VoucherInfoRepository voucherInfoRepository;
     private final UserRepository userRepository;
-
+    private final VoucherRedemptionRepository voucherRedemptionRepository;
+    private final PlatformVoucherRepository platformVoucherRepository;
+    private final VoucherInfoValidation voucherInfoValidation;
     @Override
     @Transactional
     public void createAllShopVoucher(CreateVoucherRequest request) {
         String uuidShop = shopRepository.findByUuidSeller(SecurityUtils.getCurrentUserUuid()).getUuidShop();
-        if (voucherRepository.findByVoucherCode(request.getVoucherCode()).isPresent())
-            throw new AppException(ErrorCode.VOUCHER_CODE_EXISTED);
-        Voucher voucher = getVoucher(uuidShop, request);
-        voucher.setVoucherType(VoucherType.ALL_SHOP);
-        VoucherConstraint voucherConstraint = getVoucherConstraint(voucher.getUuidVoucher(), request);
-        voucherRepository.save(voucher);
+        voucherInfoValidation.checkVoucherCodeExist(request.getVoucherCode());
+        voucherInfoValidation.checkDiscountValueValid(request.getDiscountType(), request.getDiscountPercentage());
+        VoucherInfo voucherInfo = createVoucherInfo(request);
+        VoucherConstraint voucherConstraint = createVoucherConstraint(request);
+        ShopVoucher shopVoucher = ShopVoucher.builder()
+                .uuidShop(uuidShop)
+                .uuidVoucherInfo(voucherInfo.getUuidVoucherInfo())
+                .uuidVoucherConstraint(voucherConstraint.getUuidVoucherConstraint())
+                .shopVoucherType(ShopVoucherType.ALL_SHOP)
+                .build();
+        voucherInfoRepository.save(voucherInfo);
         voucherConstraintRepository.save(voucherConstraint);
+        shopVoucherRepository.save(shopVoucher);
+    }
+
+    private VoucherInfo createVoucherInfo(CreateVoucherRequest request) {
+        return VoucherInfo.builder()
+                .voucherCode(request.getVoucherCode())
+                .discountCap(request.getDiscountCap())
+                .description(request.getDescription())
+                .discountPercentage(request.getDiscountPercentage() / 100.0)
+                .discountValue(request.getDiscountValue())
+                .isVisible(request.getIsVisible())
+                .quantity(request.getQuantity())
+                .build();
     }
 
     @Override
     @Transactional
     public void createShopProductsVoucher(CreateProductVoucherRequest request) {
         String uuidShop = shopRepository.findByUuidSeller(SecurityUtils.getCurrentUserUuid()).getUuidShop();
-        if (voucherRepository.findByVoucherCode(request.getVoucherCode()).isPresent()) {
-            throw new AppException(ErrorCode.VOUCHER_CODE_EXISTED);
-        }
+        voucherInfoValidation.checkVoucherCodeExist(request.getVoucherCode());
+        voucherInfoValidation.checkDiscountValueValid(request.getDiscountType(), request.getDiscountPercentage());
+
         List<Product> products = productRepository.findAllById(request.getUuidProducts());
         products.forEach(product -> {
             if (!product.getUuidShop().equals(uuidShop)) {
                 throw new AppException(ErrorCode.BAD_REQUEST);
             }
         });
+
         if (products.size() != request.getUuidProducts().size())
             throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
 
-        Voucher voucher = getVoucher(uuidShop, request);
-        voucher.setVoucherType(VoucherType.PRODUCTS);
-        VoucherConstraint voucherConstraint = getVoucherConstraint(voucher.getUuidVoucher(), request);
+        VoucherInfo voucherInfo = createVoucherInfo(request);
+        VoucherConstraint voucherConstraint = createVoucherConstraint(request);
+        ShopVoucher shopVoucher = ShopVoucher.builder()
+                .uuidShop(uuidShop)
+                .uuidVoucherInfo(voucherInfo.getUuidVoucherInfo())
+                .uuidVoucherConstraint(voucherConstraint.getUuidVoucherConstraint())
+                .shopVoucherType(ShopVoucherType.PRODUCTS)
+                .build();
         List<ProductVoucher> productVouchers =
                 request.getUuidProducts().stream().map(uuidProduct ->
                         ProductVoucher
                                 .builder()
                                 .uuidProduct(uuidProduct)
-                                .uuidVoucher(voucher.getUuidVoucher())
+                                .uuidVoucher(shopVoucher.getUuidVoucher())
                                 .build()
                 ).toList();
-        voucherRepository.save(voucher);
-        productVoucherRepository.saveAll(productVouchers);
+        voucherInfoRepository.save(voucherInfo);
         voucherConstraintRepository.save(voucherConstraint);
+        shopVoucherRepository.save(shopVoucher);
+        productVoucherRepository.saveAll(productVouchers);
     }
 
     @Override
-    public void createFreeShippingVoucher(CreateVoucherRequest request) {
-        if (voucherRepository.findByVoucherCode(request.getVoucherCode()).isPresent())
-            throw new AppException(ErrorCode.VOUCHER_CODE_EXISTED);
-        Voucher voucher = getVoucher(null, request);
-        voucher.setVoucherType(VoucherType.FREE_SHIPPING);
-        VoucherConstraint voucherConstraint = getVoucherConstraint(voucher.getUuidVoucher(), request);
-        voucherRepository.save(voucher);
-        voucherConstraintRepository.save(voucherConstraint);
-    }
+    public void createFreeShippingVoucher(CreatePlatformVoucherRequest request) {
+        voucherInfoValidation.preCheck(request.getVoucherCode(),
+                request.getUuidCategory(),
+                request.getDiscountType(),
+                request.getDiscountPercentage());
 
-    private Voucher getVoucher(String uuidShop, CreateVoucherRequest request) {
-        return Voucher.builder()
-                .voucherName(request.getVoucherName())
-                .voucherCode(request.getVoucherCode())
-                .quantity(request.getQuantity())
-                .discountType(request.getDiscountType())
-                .description(request.getDescription())
-                .uuidShop(uuidShop)
-                .isVisible(request.getIsVisible())
+        VoucherInfo voucherInfo = createVoucherInfo(request);
+        VoucherConstraint voucherConstraint = createVoucherConstraint(request);
+        PlatformVoucher platformVoucher = PlatformVoucher.builder()
+                .uuidVoucherInfo(voucherInfo.getUuidVoucherInfo())
+                .uuidCategory(request.getUuidCategory())
+                .uuidVoucherConstraint(voucherConstraint.getUuidVoucherConstraint())
+                .platformVoucherType(PlatformVoucherType.FREE_SHIPPING)
                 .build();
-    }
 
-    private VoucherConstraint getVoucherConstraint(String uuidVoucher, CreateVoucherRequest request) {
+        voucherInfoRepository.save(voucherInfo);
+        voucherConstraintRepository.save(voucherConstraint);
+        platformVoucherRepository.save(platformVoucher);
+    }
+    private VoucherConstraint createVoucherConstraint(CreateVoucherRequest request) {
         return VoucherConstraint
                 .builder()
-                .uuidVoucher(uuidVoucher)
                 .maxUsage(request.getMaxUsage())
                 .minSpend(request.getMinSpend())
                 .validFrom(request.getValidFrom())
@@ -118,27 +143,25 @@ public class VoucherManagementServiceImpl implements VoucherManagementService {
                 .build();
     }
 
+
     @Transactional
     @Override
     public void delete(String uuidVoucher) {
-        String uuidShop = shopRepository.findByUuidSeller(SecurityUtils.getCurrentUserUuid()).getUuidShop();
-        Voucher voucher = voucherRepository.findById(uuidVoucher)
+        ShopVoucher shopVoucher = shopVoucherRepository.findById(uuidVoucher)
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_FOUND));
-        if (!voucher.getUuidShop().equals(uuidShop)) {
-            throw new AppException(ErrorCode.BAD_REQUEST);
-        }
-        voucherRepository.deleteById(uuidVoucher);
+        shopVoucherRepository.delete(shopVoucher);
     }
 
     @Override
     @Transactional
     public void giftVoucher(String uuidVoucher, String uuidUser) {
-        voucherRedemptionService.saveVoucherRedemption(uuidVoucher, uuidUser);
+        voucherRedemptionService.saveShopVoucherRedemption(uuidVoucher, uuidUser);
     }
 
     @Override
     public void distributeVoucher(VoucherDistributionRequest request) {
-        List<VoucherConstraintProjection> vouchers = voucherRepository.findVoucherConstraint(request.getUuidVouchers());
+        log.info("distributing voucher");
+        List<VoucherConstraintProjection> vouchers = platformVoucherRepository.findVoucherConstraint(request.getUuidVouchers());
         if (vouchers.size() != request.getUuidVouchers().size())
             throw new AppException(ErrorCode.VOUCHER_NOT_FOUND);
         List<String> uuidUsers = userRepository.getAllUuids();
