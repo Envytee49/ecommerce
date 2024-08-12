@@ -2,7 +2,7 @@ package org.example.ecommerce.cart.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.ecommerce.cart.aop.AddToCartValidation;
+import org.example.ecommerce.product.aop.ProductVariantAOP;
 import org.example.ecommerce.cart.dto.request.AddToCartRequest;
 import org.example.ecommerce.cart.dto.request.ProductVariantRequest;
 import org.example.ecommerce.cart.dto.request.UpdateCartRequest;
@@ -20,7 +20,6 @@ import org.example.ecommerce.exception.ErrorCode;
 import org.example.ecommerce.product.model.Product;
 import org.example.ecommerce.product.model.Sku;
 import org.example.ecommerce.product.repository.ProductRepository;
-import org.example.ecommerce.product.repository.ProductVariantRepository;
 import org.example.ecommerce.product.repository.SkuRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +37,8 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final ProductRepository productRepository;
-    private final AddToCartValidation addToCartValidation;
+    private final ProductVariantAOP productVariantAOP;
+    private final SkuRepository skuRepository;
 
     @Override
     public PageDtoOut<CartResponse> getCart(PageDtoIn pageDtoIn) {
@@ -76,22 +77,23 @@ public class CartServiceImpl implements CartService {
     @Override
     public void add(AddToCartRequest addToCartRequest) {
         log.info("Add to cart");
-        List<ProductVariantRequest> productVariantRequests = addToCartRequest.getProductVariants();
+        Set<ProductVariantRequest> productVariantRequests = addToCartRequest.getProductVariants();
         Product product = productRepository.findById(addToCartRequest
                 .getUuidProduct()).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
-        Sku sku = addToCartValidation.checkProductVariant(product.getUuidProduct(), productVariantRequests);
+        Sku sku = productVariantAOP.checkProductVariant(product.getUuidProduct(), productVariantRequests);
 
         String uuidProduct = addToCartRequest.getUuidProduct();
         String uuidCart = SecurityUtils.getCurrentUserCartUuid();
         String uuidSku = sku == null ? null : sku.getUuidSku();
+
+        int stock = sku == null ? product.getQuantity() : sku.getQuantity();
+        if (stock - addToCartRequest.getQuantity() < 0)
+            throw new AppException(ErrorCode.NOT_ENOUGH_STOCK);
+
         CartItem cartItem;
-        if(uuidSku == null) {
-            if(product.getQuantity() - addToCartRequest.getQuantity() < 0)
-                throw new AppException(ErrorCode.NOT_ENOUGH_STOCK);
+        if (uuidSku == null) {
             cartItem = cartRepository.findByUuidCartAndUuidProduct(uuidCart, uuidProduct);
         } else {
-            if(sku.getQuantity() - addToCartRequest.getQuantity() < 0)
-                throw new AppException(ErrorCode.NOT_ENOUGH_STOCK);
             cartItem = cartRepository.findByUuidCartAndUuidSku(uuidCart, uuidSku);
         }
 
@@ -134,6 +136,19 @@ public class CartServiceImpl implements CartService {
                         updateCartRequest.getUuidCartItem(),
                         SecurityUtils.getCurrentUserCartUuid())
                 .orElseThrow(() -> new AppException(ErrorCode.CART_ITEM_NOT_FOUND));
+        int stock;
+        if (cartItem.getUuidSku() != null) {
+            Sku sku = skuRepository.findById(cartItem.getUuidSku())
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+            stock = sku.getQuantity();
+        } else {
+            Product product = productRepository.findById(cartItem.getUuidProduct())
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+            stock = product.getQuantity();
+        }
+        if (stock - updateCartRequest.getQuantity() < 0)
+            throw new AppException(ErrorCode.NOT_ENOUGH_STOCK);
+
         cartItem.setQuantity(updateCartRequest.getQuantity());
         cartRepository.save(cartItem);
     }

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor
@@ -15,7 +15,7 @@ public class AddToCartRequest {
     @NotBlank(message = "uuidProduct must not be blank")
     private String uuidProduct;
     // key: uuidProductVariant value: uuidProductVariantOption
-    private List<ProductVariantRequest> productVariants;
+    private Set<ProductVariantRequest> productVariants;
     @Min(1)
     private int quantity = 1;
 }

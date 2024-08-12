@@ -21,7 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, String> {
     // order shippingFee, total, uuidOrder
     @Query(value = "SELECT p.title as productTitle, p.uuidShop as uuidShop, " +
             "s.name as shopName, " +
-            "oi.uuidProduct as uuidProduct, oi.quantity as quantity, oi.price as originalPrice, oi.discount as discountPrice, " +
+            "oi.uuidProduct as uuidProduct, oi.quantity as quantity, oi.price as originalPrice, oi.discount as discountPercentage, " +
             "o.shippingDiscountSubtotal as shippingDiscountSubtotal, " +
             "o.shippingSubtotal as shippingSubtotal, " +
             "o.totalPayment as totalPayment, " +

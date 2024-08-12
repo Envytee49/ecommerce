@@ -2,7 +2,6 @@ package org.example.ecommerce.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 @AllArgsConstructor
@@ -78,9 +77,11 @@ public enum ErrorCode {
 
     MISSING_VARIANT_OPTION(1028, "Please select all least one product variant" ),
 
-    PRODUCT_VARIANT_FOUND(1029, "Product Variant Not Found" ),
+    PRODUCT_VARIANT_NOT_FOUND(1029, "Product Variant Not Found" ),
 
-    NOT_ENOUGH_STOCK(1030, "Not Enough Stock" );
+    NOT_ENOUGH_STOCK(1030, "Not Enough Stock" ),
+
+    INVALID_PRICE_RANGE(1031, "Invalid Price Range" );
 
     private int code;
 

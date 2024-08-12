@@ -14,6 +14,11 @@ public class ProductVariantRequest {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ProductVariantRequest that = (ProductVariantRequest) o;
-        return Objects.equals(uuidProductVariant, that.uuidProductVariant) && Objects.equals(uuidProductVariantOption, that.uuidProductVariantOption);
+        return Objects.equals(uuidProductVariant, that.uuidProductVariant);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuidProductVariant);
     }
 }

@@ -196,6 +196,7 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     @Transactional
     public void updateVoucherUsage(List<String> uuidVouchers) {
+        log.info("Update voucher usage {}", uuidVouchers);
         if (!uuidVouchers.isEmpty()) {
             List<VoucherRedemption> voucherRedemptions =
                     voucherRedemptionRepository.findByUuidVoucherInAndUuidUser(uuidVouchers, SecurityUtils.getCurrentUserUuid());

@@ -1,4 +1,4 @@
-package org.example.ecommerce.cart.aop;
+package org.example.ecommerce.product.aop;
 
 import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.cart.dto.request.ProductVariantRequest;
@@ -12,18 +12,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
-public class AddToCartValidation {
-    private static final Logger log = LoggerFactory.getLogger(AddToCartValidation.class);
+public class ProductVariantAOP {
+    private static final Logger log = LoggerFactory.getLogger(ProductVariantAOP.class);
     private final ProductVariantRepository productVariantRepository;
     private final SkuRepository skuRepository;
 
-    public Sku checkProductVariant(String uuidProduct, List<ProductVariantRequest> productVariantRequests) {
+    public Sku checkProductVariant(String uuidProduct, Set<ProductVariantRequest> productVariantRequests) {
         int productVariantCount = productVariantRepository.countProductVariant(uuidProduct);
         if (productVariantRequests != null) {
-            log.info("Product variant exists");
+            log.info("Product variant request exists");
             if (!productVariantRequests.isEmpty()) {
                 if (productVariantCount == 0) {
                     log.error("Product variant is empty");
@@ -42,13 +43,14 @@ public class AddToCartValidation {
                     .stream()
                     .map(ProductVariantRequest::getUuidProductVariant)
                     .toList();
+            log.info("Product variants {}", productVariants);
             List<String> productVariantOptions = productVariantRequests
                     .stream()
                     .map(ProductVariantRequest::getUuidProductVariantOption)
                     .toList();
-
-            Sku sku = skuRepository.findByVariantOption(uuidProduct, productVariants, productVariantOptions)
-                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_FOUND));
+            log.info("Product variant options {}", productVariantOptions);
+            Sku sku = skuRepository.findByVariantOption(uuidProduct, productVariants, productVariantOptions, productVariantCount)
+                    .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_VARIANT_NOT_FOUND));
             return sku;
         }
         if (productVariantCount > 0) {

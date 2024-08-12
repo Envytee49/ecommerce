@@ -23,6 +23,8 @@ import org.example.ecommerce.user.repository.UserAddressRepository;
 import org.example.ecommerce.user.service.UserInfoService;
 import org.example.ecommerce.user.service.impl.UserInfoServiceImpl;
 import org.example.ecommerce.voucher.service.VoucherService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
+    private static final Logger log = LoggerFactory.getLogger(OrderServiceImpl.class);
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
     private final UserAddressRepository userAddressRepository;
@@ -85,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
                             .uuidOrder(order.getUuidOrder())
                             .quantity(cartItem.getQuantity())
                             .price(cartItem.getUnitPrice())
-                            .discount(cartItem.getDiscountPrice())
+                            .discount(cartItem.getDiscountPercentage())
                             .uuidProduct(cartItem.getUuidProduct())
                             .uuidSku(cartItem.getUuidSku())
                             .build()
@@ -118,7 +121,7 @@ public class OrderServiceImpl implements OrderService {
             orderItems.get(orderItems.indexOf(shopOrder)).updateOrderItemList(OrderItem.builder()
                             .quantity(o.getQuantity())
                             .price(o.getOriginalPrice())
-                            .discount(o.getDiscountPrice())
+                            .discount(o.getDiscountPercentage())
                             .uuidProduct(o.getUuidProduct())
                     .build());
         }
@@ -144,7 +147,7 @@ public class OrderServiceImpl implements OrderService {
                         .builder()
                         .quantity(orderItemProjection.getQuantity())
                         .price(orderItemProjection.getOriginalPrice())
-                        .discount(orderItemProjection.getDiscountPrice())
+                        .discount(orderItemProjection.getDiscountPercentage())
                         .uuidProduct(orderItemProjection.getUuidProduct())
                         .build())
                 .toList();

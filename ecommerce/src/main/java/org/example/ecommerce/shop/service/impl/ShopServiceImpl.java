@@ -1,8 +1,8 @@
 package org.example.ecommerce.shop.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.ecommerce.common.constants.TBEnum;
-import org.example.ecommerce.common.constants.TSPEnum;
+import org.example.ecommerce.common.constants.sortby.TBEnum;
+import org.example.ecommerce.common.constants.sortby.TSPEnum;
 import org.example.ecommerce.common.dto.PageDtoIn;
 import org.example.ecommerce.common.dto.PageDtoOut;
 import org.example.ecommerce.common.util.Utils;
@@ -24,7 +24,8 @@ import org.example.ecommerce.shop.repository.ShopAddressRepository;
 import org.example.ecommerce.shop.repository.ShopRepository;
 import org.example.ecommerce.shop.service.ShopService;
 import org.example.ecommerce.user.service.UserManagementService;
-import org.example.ecommerce.user.service.impl.UserManagementServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ShopServiceImpl implements ShopService {
+    private static final Logger log = LoggerFactory.getLogger(ShopServiceImpl.class);
     private final ShopRepository shopRepository;
     private final OrderRepository orderRepository;
     private final ShopAddressRepository shopAddressRepository;
@@ -72,9 +74,12 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public PageDtoOut<TopSellingProduct> getTopSellingProducts(PageDtoIn pageDtoIn, List<String> sortBy, String sortDirection) {
+        log.info("Get top selling product");
         Sort sort = Utils.getSortStrategy(sortBy, TSPEnum.class, sortDirection);
         Pageable pageRequest = PageRequest.of(pageDtoIn.getPage() - 1, pageDtoIn.getSize(), sort);
+        log.info("find uuid shop");
         String uuidShop = shopRepository.findByUuidSeller(SecurityUtils.getCurrentUserUuid()).getUuidShop();
+        log.info("find top selling products");
         Page<TSPProjection> tspProjections =  shopRepository.findTopSellingProducts(uuidShop, pageRequest);
 
         List<TopSellingProduct> topSellingProducts = tspProjections.getContent().stream().map(
@@ -96,9 +101,12 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public PageDtoOut<TopBuyer> getTopBuyers(PageDtoIn pageDtoIn, List<String> sortBy, String sortDirection) {
+        log.info("Get top buyers");
         Sort sort = Utils.getSortStrategy(sortBy, TBEnum.class, sortDirection);
         Pageable pageRequest = PageRequest.of(pageDtoIn.getPage() - 1, pageDtoIn.getSize(), sort);
+        log.info("find uuidShop");
         String uuidShop = shopRepository.findByUuidSeller(SecurityUtils.getCurrentUserUuid()).getUuidShop();
+        log.info("find top buyers");
         Page<TBProjection> tbProjections = shopRepository.findTopBuyers(uuidShop,pageRequest);
         List<TopBuyer> topBuyers = tbProjections
                 .getContent()

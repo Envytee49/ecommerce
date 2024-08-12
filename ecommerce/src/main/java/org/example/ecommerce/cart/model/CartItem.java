@@ -55,6 +55,14 @@ public class CartItem extends AbstractEntity {
     @Column(name = "active")
     private int active = 0;
 
-
+    @Override
+    public String toString() {
+        return "CartItem{" +
+                "unitPrice=" + unitPrice +
+                ", uuidCartItem='" + uuidCartItem + '\'' +
+                ", quantity=" + quantity +
+                ", discount=" + discount +
+                '}';
+    }
 }
 

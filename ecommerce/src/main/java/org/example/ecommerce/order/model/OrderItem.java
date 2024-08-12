@@ -1,10 +1,7 @@
 package org.example.ecommerce.order.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -13,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.ecommerce.common.model.AbstractEntity;
 import org.example.ecommerce.common.util.Utils;
+import org.example.ecommerce.product.model.Product;
 
 @Data
 @Builder
@@ -56,4 +54,5 @@ public class OrderItem extends AbstractEntity {
     @Builder.Default
     @Column(name = "quantity")
     private double quantity = 0;
+
 }

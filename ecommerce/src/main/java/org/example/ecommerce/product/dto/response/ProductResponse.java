@@ -3,6 +3,7 @@ package org.example.ecommerce.product.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 import org.example.ecommerce.product.model.Product;
+import org.example.ecommerce.product.projections.ProductResponseProjection;
 
 @Getter
 @Builder
@@ -13,14 +14,20 @@ public class ProductResponse {
 
     private double price;
 
-    private double averageRating;
+    private double discount;
 
-    private int sold;
+    private double priceAfterDiscount;
 
-    public static ProductResponse from(Product product) {
+    private Double averageRating;
+
+    private Integer sold;
+
+    public static ProductResponse from(ProductResponseProjection product) {
         return ProductResponse.builder()
-                .averageRating(3.0)
-                .sold(1000)
+                .averageRating(product.getAverageRating())
+                .sold(product.getSold())
+                .discount(product.getDiscount())
+                .priceAfterDiscount(product.getPrice() * (1 - product.getDiscount()))
                 .price(product.getPrice())
                 .title(product.getTitle())
                 .uuidProduct(product.getUuidProduct())

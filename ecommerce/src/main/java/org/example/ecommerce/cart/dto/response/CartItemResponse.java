@@ -25,7 +25,7 @@ public class CartItemResponse {
 
     private double discountPercentage;
 
-    private double discountPrice;
+    private double priceAfterDiscount;
 
     private int quantity;
 
@@ -38,12 +38,20 @@ public class CartItemResponse {
                 .uuidSku(cartItem.getUuidSku())
                 .uuidProduct(cartItem.getUuidProduct())
                 .unitPrice(cartItem.getUnitPrice())
-                .discountPercentage(cartItem.getDiscount() * 100)
-                .discountPrice(cartItem.getDiscount() * cartItem.getUnitPrice())
+                .discountPercentage(cartItem.getDiscount())
+                .priceAfterDiscount((1-cartItem.getDiscount()) * cartItem.getUnitPrice())
                 .productVariantOptions(cartItem.getProductVariantOptions())
-                .subTotal(cartItem.getUnitPrice() * cartItem.getQuantity())
+                .subTotal((1-cartItem.getDiscount()) * cartItem.getUnitPrice() * cartItem.getQuantity())
                 .quantity(cartItem.getQuantity())
                 .active(cartItem.getActive())
                 .build();
+    }
+
+    @Override
+    public String toString() {
+        return "CartItemResponse{" +
+                "uuidCartItem='" + uuidCartItem + '\'' +
+                ", discountPercentage=" + discountPercentage +
+                '}';
     }
 }

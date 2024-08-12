@@ -15,6 +15,7 @@ select * from shop;
 select * from voucher_info;
 select * from cancel_order_reason;
 select * from product;
+select * from product_review;
 select * from category;
 select * from `order`;
 select * from `order_item`;
@@ -30,10 +31,11 @@ select * from cancelled_order;
 
 SELECT s1_0.uuid_sku, s1_0.price, s1_0.quantity, s1_0.sku, s1_0.uuid_product
 FROM sku s1_0
-WHERE s1_0.uuid_sku = (SELECT spvo1_0.uuid_sku FROM sku_product_variant_option spvo1_0
-WHERE spvo1_0.uuid_product_variant IN ('27a2c4ae-dbd6-4b7e-a3a2-6c03b08cd26b', '1eb4f263-48b3-4900-bd83-beebe9808c63')
-AND spvo1_0.uuid_product_variant_option IN ('b5af5e48-2c15-42ab-962a-c1fba2aa14ce', '9db66a6e-5f6c-4c8b-b087-6968087ee80e')
+WHERE s1_0.uuid_sku = (SELECT * FROM sku_product_variant_option spvo1_0
+WHERE spvo1_0.uuid_product_variant IN ('3e7c5487-c30d-46c3-9a20-47a60b55b998', '3e7c5487-c30d-46c3-9a20-47a60b55b998')
+AND spvo1_0.uuid_product_variant_option IN ('08a022d4-c816-44a3-b55b-68d262397ba1', '8ea08453-ca4a-4779-b782-fccc4db60105')
 GROUP BY spvo1_0.uuid_sku 
 order by COUNT(spvo1_0.uuid_sku)
 LIMIT 1
 )
+

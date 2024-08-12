@@ -36,6 +36,10 @@ public class ProductReview extends AbstractEntity {
     @Column(name = "uuid_parent_product_review")
     private String uuidParentProductReview;
 
+    @Size(max = 40)
+    @Column(name = "uuid_user")
+    private String uuidUser;
+
     @Column(name = "comment")
     private String comment;
 
@@ -48,11 +52,6 @@ public class ProductReview extends AbstractEntity {
     @Builder.Default
     @Column(name = "rating")
     private int rating = 0;
-
-    @NotNull
-    @Builder.Default
-    @Column(name = "published")
-    private int published = 0;
 
 }
 

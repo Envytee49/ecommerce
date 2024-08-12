@@ -18,7 +18,7 @@ public class InvoiceItemResponse {
 
     private double discount;
 
-    private double discountPrice;
+    private double priceAfterDiscount;
 
     private int quantity;
 
@@ -28,7 +28,7 @@ public class InvoiceItemResponse {
                 .unitPrice(cartItem.getUnitPrice())
                 .subtotal(cartItem.getUnitPrice() * cartItem.getQuantity())
                 .discount(cartItem.getDiscount())
-                .discountPrice(cartItem.getDiscount() * cartItem.getUnitPrice())
+                .priceAfterDiscount(cartItem.getDiscount() * cartItem.getUnitPrice())
                 .quantity(cartItem.getQuantity())
                 .uuidCartItem(cartItem.getUuidCartItem())
                 .build();

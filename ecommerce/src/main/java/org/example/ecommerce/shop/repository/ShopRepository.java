@@ -16,13 +16,20 @@ public interface ShopRepository extends JpaRepository<Shop, String> {
     // order -> shop id = current seller shop id
     // order item ->
     // COUNT(quantity) group by uuidProduct
-    @Query(value = "SELECT p.uuid_product as uuidProduct, p.title as productTitle, COUNT(oi.uuid_order) as orderCounts , SUM(oi.quantity) as unitsSold, SUM(oi.price * oi.quantity) as revenue " +
+    @Query(value = "SELECT p.uuid_product as uuidProduct," +
+            " p.title as productTitle," +
+            " COUNT(oi.uuid_order) as orderCounts ," +
+            " SUM(oi.quantity) as unitsSold," +
+            " SUM(oi.price * oi.quantity * (1 - oi.discount)) as revenue " +
             "FROM product p " +
             "JOIN order_item oi ON oi.uuid_product = p.uuid_product " +
             "WHERE p.uuid_shop = :uuid_shop " +
             "GROUP BY p.uuid_product", nativeQuery = true)
     Page<TSPProjection> findTopSellingProducts(@Param("uuid_shop") String uuidShop, Pageable pageable);
-    @Query(value = "SELECT u.uuid_user as uuidUser, u.username as username, SUM(o.total) as totalSpend, COUNT(o.uuid_order) as orderCounts " +
+    @Query(value = "SELECT u.uuid_user as uuidUser, " +
+            "u.username as username, " +
+            "SUM(o.total_payment) as totalSpend, " +
+            "COUNT(o.uuid_order) as orderCounts " +
             "FROM `Order`  o " +
             "INNER JOIN User u ON o.uuid_user = u.uuid_user " +
             "WHERE o.uuid_shop = :uuidShop " +

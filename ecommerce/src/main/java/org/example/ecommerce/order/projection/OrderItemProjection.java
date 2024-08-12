@@ -8,7 +8,7 @@ public interface OrderItemProjection {
     String getUuidUAddress();
     int getQuantity();
     double getOriginalPrice();
-    double getDiscountPrice();
+    double getDiscountPercentage();
     double getMerchandiseSubtotal();
     double getShippingSubtotal();
     Double getShippingDiscountSubtotal();

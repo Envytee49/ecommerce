@@ -82,7 +82,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         List<CartItemProjection> cartItems = cartRepository.findAllByUuidCartItemAndUuidCart(
                 uuidCartItems,
                 SecurityUtils.getCurrentUserCartUuid());
-
         if (cartItems.size() != uuidCartItems.size())
             throw new AppException(ErrorCode.CART_ITEM_NOT_FOUND);
 
@@ -95,6 +94,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         if (shops.size() != itemsByShop.size()) // check ?
             throw new AppException(ErrorCode.SHOP_NOT_FOUND);
+
+        if(itemsByShop.size() != shopVouchers.size()) {
+            log.info("Invalid shop vouchers request");
+            throw new AppException(ErrorCode.BAD_REQUEST);
+        }
 
         for (Shop shop : shops) {
             // Cart items logic

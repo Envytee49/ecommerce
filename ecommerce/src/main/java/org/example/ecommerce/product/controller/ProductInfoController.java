@@ -1,11 +1,15 @@
 package org.example.ecommerce.product.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.common.ApiResponse;
 import org.example.ecommerce.common.controller.AbstractController;
 import org.example.ecommerce.common.dto.PageDtoIn;
 import org.example.ecommerce.common.dto.PageDtoOut;
+import org.example.ecommerce.product.dto.request.ProductVariantDetailRequest;
 import org.example.ecommerce.product.dto.request.ReplyProductReviewRequest;
 import org.example.ecommerce.product.dto.request.ReviewProductRequest;
 import org.example.ecommerce.product.dto.response.ProductDetailResponse;
@@ -25,21 +29,26 @@ public class ProductInfoController extends AbstractController {
 
     // service
     // function interface
-    @GetMapping
+    @GetMapping("/search")
     ApiResponse<PageDtoOut<ProductResponse>> getAllProducts(
             @Valid @RequestBody PageDtoIn pageDtoIn,
-            @RequestParam(required = false) String keyword,
+            @RequestParam String keyword,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDirection,
-            @RequestParam(required = false) String minPrice,
-            @RequestParam(required = false) String maxPrice,
-            @RequestParam(required = false) String ratingFilter) {
+            @RequestParam(required = false) @Min(value = 0) Double minPrice,
+            @RequestParam(required = false) @Min(value = 0) Double maxPrice,
+            @RequestParam(required = false) @Min(value = 1) @Max(value = 5) Integer ratingFilter) {
         return respond(() -> productService.getAll(pageDtoIn, keyword, sortBy, sortDirection, minPrice, maxPrice, ratingFilter));
     }
 
     @GetMapping("/{uuidProduct}")
     ApiResponse<ProductDetailResponse> getProductDetail(@PathVariable String uuidProduct) {
         return respond(() -> productService.getProductByUuid(uuidProduct));
+    }
+
+    @GetMapping("/variant")
+    ApiResponse<?> getProductVariantDetail(@Valid @RequestBody ProductVariantDetailRequest request) {
+        return respond(() -> productService.getProductVariantDetail(request));
     }
 
     @GetMapping("/reviews/{uuidProduct}")
@@ -49,13 +58,13 @@ public class ProductInfoController extends AbstractController {
 
     @PostMapping("/reviews/{uuidProduct}")
     @PreAuthorize("hasRole('USER')")
-    ApiResponse<?> reviewProduct(@PathVariable String uuidProduct,@Valid @RequestBody ReviewProductRequest request) {
+    ApiResponse<?> reviewProduct(@PathVariable String uuidProduct, @Valid @RequestBody ReviewProductRequest request) {
         return respond(() -> productService.reviewProduct(uuidProduct, request), "Product reviewed");
     }
 
     @PostMapping("/review/reply/{uuidProduct}")
     @PreAuthorize("hasRole('SELLER')")
-    ApiResponse<?> replyProductReview(@PathVariable String uuidProduct,@Valid @RequestBody ReplyProductReviewRequest request) {
+    ApiResponse<?> replyProductReview(@PathVariable String uuidProduct, @Valid @RequestBody ReplyProductReviewRequest request) {
         return respond(() -> productService.replyProductReview(uuidProduct, request), "Review Replied");
     }
 

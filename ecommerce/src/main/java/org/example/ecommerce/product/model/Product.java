@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.ecommerce.common.model.AbstractEntity;
 import org.example.ecommerce.common.util.Utils;
+import org.example.ecommerce.order.model.OrderItem;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,5 +67,10 @@ public class Product extends AbstractEntity {
     @Column(name = "uuid_shop")
     private String uuidShop;
 
+    @OneToMany(mappedBy = "uuidProduct", fetch = FetchType.LAZY)
+    private List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "uuidProduct", fetch = FetchType.LAZY)
+    private List<ProductReview> productReviews;
 }
 

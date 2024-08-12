@@ -16,8 +16,10 @@ public interface SkuRepository extends JpaRepository<Sku, String> {
             "    WHERE spvo.uuidProductVariant IN :productVariants " +
             "    AND spvo.uuidProductVariantOption IN :productVariantOptions " +
             "    GROUP BY spvo.uuidSku " +
+            "    HAVING COUNT(DISTINCT spvo.uuidProductVariant)  = :productVariantCount AND " +
+            "    COUNT(DISTINCT spvo.uuidProductVariantOption)  = :productVariantCount" +
             "    ORDER BY COUNT(spvo.uuidSku) " +
             "    LIMIT 1" +
             ") AND s.uuidProduct = :uuidProduct")
-    Optional<Sku> findByVariantOption(String uuidProduct, List<String> productVariants, List<String> productVariantOptions);
+    Optional<Sku> findByVariantOption(String uuidProduct, List<String> productVariants, List<String> productVariantOptions, int productVariantCount);
 }

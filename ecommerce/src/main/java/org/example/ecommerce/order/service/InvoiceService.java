@@ -10,9 +10,10 @@ import java.util.Map;
 
 public interface InvoiceService {
     InvoiceResponse getInvoice(InvoiceRequest request);
-    public List<InvoiceDetailResponse> getInvoiceDetails(Map<String, String> shopVouchers,
-                                                         List<String> uuidCartItems,
-                                                         String uuidUAddress,
-                                                         String freeShippingVoucher,
-                                                         String discountCashbackVoucher);
+
+    List<InvoiceDetailResponse> getInvoiceDetails(Map<String, String> shopVouchers,
+                                                  List<String> uuidCartItems,
+                                                  String uuidUAddress,
+                                                  String freeShippingVoucher,
+                                                  String discountCashbackVoucher);
 }
