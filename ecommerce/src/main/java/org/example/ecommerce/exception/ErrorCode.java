@@ -81,7 +81,9 @@ public enum ErrorCode {
 
     NOT_ENOUGH_STOCK(1030, "Not Enough Stock" ),
 
-    INVALID_PRICE_RANGE(1031, "Invalid Price Range" );
+    INVALID_PRICE_RANGE(1031, "Invalid Price Range" ),
+
+    MISMATCH_QUANTITY(1032, "Total quantity and sku quantity does not match" );
 
     private int code;
 

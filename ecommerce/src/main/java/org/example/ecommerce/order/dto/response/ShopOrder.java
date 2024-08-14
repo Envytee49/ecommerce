@@ -22,7 +22,7 @@ public class ShopOrder {
     private Double shippingDiscountSubtotal;
     private Double voucherDiscount;
     private Double totalPayment;
-    private List<OrderItem> orderItems;
+    private List<OrderItemResponse> orderItems;
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -31,7 +31,7 @@ public class ShopOrder {
         return Objects.equals(uuidOrder, shopOrder.uuidOrder) && Objects.equals(uuidShop, shopOrder.uuidShop);
     }
 
-    public void updateOrderItemList(OrderItem orderItem) {
+    public void updateOrderItemList(OrderItemResponse orderItem) {
         this.orderItems.add(orderItem);
     }
 }

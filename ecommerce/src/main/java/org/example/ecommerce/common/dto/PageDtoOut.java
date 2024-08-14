@@ -26,6 +26,7 @@ public class PageDtoOut<T> {
                 .size(size)
                 .totalElements(totalElements)
                 .totalPages(totalPages)
-                .data(data).build();
+                .data(data)
+                .build();
     }
 }

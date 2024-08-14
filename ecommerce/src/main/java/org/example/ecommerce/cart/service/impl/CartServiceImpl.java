@@ -87,6 +87,7 @@ public class CartServiceImpl implements CartService {
         String uuidSku = sku == null ? null : sku.getUuidSku();
 
         int stock = sku == null ? product.getQuantity() : sku.getQuantity();
+        String productTitle = product.getTitle() + (sku != null ? sku.getSku() : "");
         if (stock - addToCartRequest.getQuantity() < 0)
             throw new AppException(ErrorCode.NOT_ENOUGH_STOCK);
 

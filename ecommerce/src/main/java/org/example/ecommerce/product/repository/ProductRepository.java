@@ -16,17 +16,17 @@ public interface ProductRepository extends JpaRepository<Product, String>, JpaSp
 
     Optional<Product> findByUuidProductAndUuidShop(String uuidProduct, String uuidShop);
 
-    @Query("SELECT " +
-            " p.uuidProduct as uuidProduct, " +
-            " p.title as title, " +
-            " p.price as price," +
-            " p.discount as discount," +
-            " SUM(oi.quantity) as sold, " +
-            " AVG(pv.rating) as averageRating " +
-            " FROM Product p " +
-            "LEFT JOIN ProductReview pv ON p.uuidProduct = pv.uuidProduct " +
-            "LEFT JOIN OrderItem oi ON oi.uuidProduct = p.uuidProduct " +
-            "WHERE p.uuidProduct in (:uuidProducts) " +
-            "GROUP BY p.uuidProduct")
-    List<ProductResponseProjection> findAll(List<String> uuidProducts);
+//    @Query("SELECT " +
+//            " p.uuidProduct as uuidProduct, " +
+//            " p.title as title, " +
+//            " p.price as price," +
+//            " p.discount as discount," +
+//            " SUM(oi.quantity) as sold, " +
+//            " AVG(pv.rating) as averageRating " +
+//            " FROM Product p " +
+//            "LEFT JOIN ProductReview pv ON p.uuidProduct = pv.uuidProduct " +
+//            "LEFT JOIN OrderItem oi ON oi.uuidProduct = p.uuidProduct " +
+//            "WHERE p.uuidProduct in (:uuidProducts) " +
+//            "GROUP BY p.uuidProduct")
+//    List<ProductResponseProjection> findAll(List<String> uuidProducts);
 }

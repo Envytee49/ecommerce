@@ -21,10 +21,19 @@ public class ProductVariantOption {
     @Size(max = 36)
     @Builder.Default
     @Column(name = "uuid_product_variant_option")
-    private String uuidProductVariantOption = Utils.getTSUuid();
+    private String uuidProductVariantOption = Utils.getUuid();
     @Column(name = "uuid_product_variant")
     @Size(max = 40)
     private String uuidProductVariant;
     @Column(name = "name")
     private String name;
+
+    @Override
+    public String toString() {
+        return "ProductVariantOption{" +
+                "uuidProductVariantOption='" + uuidProductVariantOption + '\'' +
+                ", uuidProductVariant='" + uuidProductVariant + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

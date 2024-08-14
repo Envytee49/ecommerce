@@ -788,6 +788,7 @@ CREATE TABLE IF NOT EXISTS `product_review` (
   `uuid_product` VARCHAR(40) NOT NULL,
   `uuid_user` VARCHAR(40) NOT NULL,
   `uuid_parent_product_review` VARCHAR(40) NULL DEFAULT NULL,
+  `varitation` text NULL DEFAULT NULL,
   `comment` TEXT NULL DEFAULT NULL,
   `title` VARCHAR(100) NOT NULL,
   `rating` SMALLINT NOT NULL DEFAULT '0',

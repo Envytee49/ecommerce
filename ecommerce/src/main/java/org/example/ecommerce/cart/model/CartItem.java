@@ -64,5 +64,6 @@ public class CartItem extends AbstractEntity {
                 ", discount=" + discount +
                 '}';
     }
+
 }
 

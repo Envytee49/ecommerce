@@ -1,11 +1,14 @@
 package org.example.ecommerce.order.projection;
 
 public interface OrderItemProjection {
+    String getUuidOrderItem();
     String getUuidOrder();
     String getUuidShop();
     String getShopName();
     String getUuidProduct();
-    String getUuidUAddress();
+    String getUuidSku();
+    String getProductTitle();
+    String getProductVariantOption();
     int getQuantity();
     double getOriginalPrice();
     double getDiscountPercentage();
@@ -13,5 +16,6 @@ public interface OrderItemProjection {
     double getShippingSubtotal();
     Double getShippingDiscountSubtotal();
     Double getVoucherDiscount();
+    String getUuidUAddress();
     double getTotalPayment();
 }

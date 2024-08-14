@@ -43,6 +43,9 @@ public class ProductReview extends AbstractEntity {
     @Column(name = "comment")
     private String comment;
 
+    @Column(name = "variation")
+    private String variation;
+
     @NotNull
     @Size(max = 100)
     @Column(name = "title")

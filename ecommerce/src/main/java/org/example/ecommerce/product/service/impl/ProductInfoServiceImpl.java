@@ -1,12 +1,15 @@
 package org.example.ecommerce.product.service.impl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.ecommerce.configuration.security.SecurityUtils;
-import org.example.ecommerce.product.aop.ProductVariantAOP;
+import org.example.ecommerce.common.constants.OrderStatus;
 import org.example.ecommerce.common.dto.PageDtoIn;
 import org.example.ecommerce.common.dto.PageDtoOut;
+import org.example.ecommerce.configuration.security.SecurityUtils;
 import org.example.ecommerce.exception.AppException;
 import org.example.ecommerce.exception.ErrorCode;
+import org.example.ecommerce.order.model.Order;
+import org.example.ecommerce.order.repository.OrderRepository;
+import org.example.ecommerce.product.aop.ProductVariantAOP;
 import org.example.ecommerce.product.aop.SearchProductAOP;
 import org.example.ecommerce.product.dto.request.ProductVariantDetailRequest;
 import org.example.ecommerce.product.dto.request.ReplyProductReviewRequest;
@@ -15,11 +18,11 @@ import org.example.ecommerce.product.dto.response.*;
 import org.example.ecommerce.product.model.Product;
 import org.example.ecommerce.product.model.ProductReview;
 import org.example.ecommerce.product.model.Sku;
-import org.example.ecommerce.product.projections.ProductResponseProjection;
+import org.example.ecommerce.product.projections.ProductReviewProjection;
 import org.example.ecommerce.product.repository.CategoryRepository;
 import org.example.ecommerce.product.repository.ProductRepository;
 import org.example.ecommerce.product.repository.ProductReviewRepository;
-import org.example.ecommerce.product.repository.specification.ProductSpecifications;
+import org.example.ecommerce.product.repository.custom.SearchProductRepository;
 import org.example.ecommerce.product.service.ProductInfoService;
 import org.example.ecommerce.product.service.ProductVariantService;
 import org.slf4j.Logger;
@@ -41,6 +44,8 @@ public class ProductInfoServiceImpl implements ProductInfoService {
     private final ProductVariantAOP productVariantAOP;
     private final SearchProductAOP searchProductAOP;
     private final ProductReviewRepository productReviewRepository;
+    private final SearchProductRepository searchProductRepository;
+    private final OrderRepository orderRepository;
 
     @Override
     public PageDtoOut<ProductResponse> getAll(PageDtoIn pageDtoIn,
@@ -53,28 +58,19 @@ public class ProductInfoServiceImpl implements ProductInfoService {
         searchProductAOP.checkSearchProductParams(minPrice, maxPrice, sortBy, sortDirection);
         // get all products by page and size
         Pageable pageRequest = PageRequest.of(pageDtoIn.getPage() - 1, pageDtoIn.getSize());
-        Page<Product> products = productRepository.findAll(
-                ProductSpecifications.withFilters(
-                        keyword,
-                        sortBy,
-                        sortDirection,
-                        minPrice,
-                        maxPrice,
-                        ratingFilter),
+        Page<ProductResponse> productResponses = searchProductRepository.findAllWithFilters(keyword,
+                sortBy,
+                sortDirection,
+                minPrice,
+                maxPrice,
+                ratingFilter,
                 pageRequest);
-        List<String> uuidProducts = products.getContent().stream().map(Product::getUuidProduct).toList();
-        List<ProductResponseProjection> productProjections = productRepository.findAll(uuidProducts);
-        // convert to product response
-        List<ProductResponse> productResponse = productProjections
-                .stream()
-                .map(ProductResponse::from)
-                .toList();
 
         return PageDtoOut.from(
                 pageDtoIn.getPage(),
                 pageDtoIn.getSize(),
-                products.getTotalElements(),
-                productResponse);
+                productResponses.getTotalElements(),
+                productResponses.getContent());
     }
 
     @Override
@@ -101,13 +97,43 @@ public class ProductInfoServiceImpl implements ProductInfoService {
     }
 
     @Override
-    public ProductReviewResponse getProductReviewByUuid(String uuidProduct) {
-        return null;
+    public ProductReviewResponse getProductReviewByUuid(String uuidProduct, PageDtoIn pageDtoIn) {
+        Pageable pageRequest = PageRequest.of(pageDtoIn.getPage() - 1, pageDtoIn.getSize());
+        Page<ProductReviewProjection> projection = productReviewRepository.findProductReview(uuidProduct, pageRequest);
+        List<ProductReviewDetailResponse> responses = projection
+                .getContent()
+                .stream()
+                .map(p -> ProductReviewDetailResponse
+                        .builder()
+                        .uuidProductReview(p.getUuidProductReview())
+                        .title(p.getTitle())
+                        .rating(p.getRating())
+                        .variation(p.getVariation())
+                        .comment(p.getComment())
+                        .createdAt(p.getCreatedDate())
+                        .username(p.getUsername())
+                        .build())
+                .toList();
+        Double averageRating = productReviewRepository.calculateAverageRating(uuidProduct);
+        return ProductReviewResponse.from(
+                pageDtoIn.getPage(),
+                pageDtoIn.getSize(),
+                projection.getTotalElements(),
+                averageRating,
+                responses);
     }
 
     @Override
     public void reviewProduct(String uuidProduct, ReviewProductRequest request) {
-//        String uuidOrder = request.getUuidOrder();
+        Product product = productRepository.findById(uuidProduct)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+        String uuidOrder = request.getUuidOrder();
+        Order order = orderRepository.findByUuidOrderAndUuidUser(uuidOrder,SecurityUtils.getCurrentUserUuid())
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        if(order.getStatus() != OrderStatus.DELIVERED)
+            throw new AppException(ErrorCode.BAD_REQUEST);
+        String variation = orderRepository.findProductVariation(uuidProduct, uuidOrder)
+                .orElse(null);
         ProductReview productReview = ProductReview
                 .builder()
                 .uuidProduct(uuidProduct)
@@ -115,6 +141,7 @@ public class ProductInfoServiceImpl implements ProductInfoService {
                 .title(request.getTitle())
                 .rating(request.getRating())
                 .comment(request.getComment())
+                .variation(variation)
                 .build();
         productReviewRepository.save(productReview);
     }

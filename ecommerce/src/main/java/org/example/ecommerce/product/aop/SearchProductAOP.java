@@ -14,6 +14,7 @@ public class SearchProductAOP {
                                          Double maxPrice,
                                          String sortBy,
                                          String sortDirection) {
+
         if (minPrice != null && maxPrice != null) {
             if(minPrice > maxPrice)
                 throw new AppException(ErrorCode.INVALID_PRICE_RANGE);

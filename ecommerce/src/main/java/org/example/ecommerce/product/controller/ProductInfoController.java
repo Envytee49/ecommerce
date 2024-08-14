@@ -3,7 +3,7 @@ package org.example.ecommerce.product.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.example.ecommerce.common.ApiResponse;
 import org.example.ecommerce.common.controller.AbstractController;
@@ -14,7 +14,6 @@ import org.example.ecommerce.product.dto.request.ReplyProductReviewRequest;
 import org.example.ecommerce.product.dto.request.ReviewProductRequest;
 import org.example.ecommerce.product.dto.response.ProductDetailResponse;
 import org.example.ecommerce.product.dto.response.ProductResponse;
-import org.example.ecommerce.product.dto.response.ProductReviewResponse;
 import org.example.ecommerce.product.service.ProductInfoService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +31,7 @@ public class ProductInfoController extends AbstractController {
     @GetMapping("/search")
     ApiResponse<PageDtoOut<ProductResponse>> getAllProducts(
             @Valid @RequestBody PageDtoIn pageDtoIn,
-            @RequestParam String keyword,
+            @RequestParam @NotBlank String keyword,
             @RequestParam(required = false) String sortBy,
             @RequestParam(required = false) String sortDirection,
             @RequestParam(required = false) @Min(value = 0) Double minPrice,
@@ -52,8 +51,9 @@ public class ProductInfoController extends AbstractController {
     }
 
     @GetMapping("/reviews/{uuidProduct}")
-    ApiResponse<ProductReviewResponse> getProductReview(@PathVariable String uuidProduct) {
-        return respond(() -> productService.getProductReviewByUuid(uuidProduct));
+    ApiResponse<?> getProductReview(@PathVariable String uuidProduct,
+                                                                    @RequestBody PageDtoIn pageDtoIn) {
+        return respond(() -> productService.getProductReviewByUuid(uuidProduct, pageDtoIn));
     }
 
     @PostMapping("/reviews/{uuidProduct}")

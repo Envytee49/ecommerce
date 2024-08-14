@@ -5,11 +5,11 @@ public interface ProductResponseProjection {
 
     String getTitle();
 
-    double getDiscount();
-
     double getPrice();
 
-    Double getAverageRating();
+    double getDiscount();
 
-    Integer getSold();
+    Long getSold();
+
+    Double getAverageRating();
 }

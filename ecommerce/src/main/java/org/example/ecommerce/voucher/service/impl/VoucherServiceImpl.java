@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -195,7 +196,9 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     @Transactional
-    public void updateVoucherUsage(List<String> uuidVouchers) {
+    public void updateVoucherUsage(Map<String, String> shopVouchers) {
+        if(shopVouchers == null) return;
+        List<String> uuidVouchers = shopVouchers.values().stream().toList();
         log.info("Update voucher usage {}", uuidVouchers);
         if (!uuidVouchers.isEmpty()) {
             List<VoucherRedemption> voucherRedemptions =

@@ -19,7 +19,7 @@ public interface ProductInfoService {
 
     ProductVariantDetailResponse getProductVariantDetail(ProductVariantDetailRequest request);
 
-    ProductReviewResponse getProductReviewByUuid(String uuidProduct);
+    ProductReviewResponse getProductReviewByUuid(String uuidProduct, PageDtoIn pageDtoIn);
 
     void reviewProduct(String uuidProduct, ReviewProductRequest request);
 

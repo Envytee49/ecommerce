@@ -6,9 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -25,12 +26,27 @@ public class CreateProductRequest {
     private Double price;
 
     @NotNull
-    private int quantity;
+    @Min(value = 1)
+    private Integer quantity;
 
     private String description;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull
     private LocalDateTime publishedDate;
+
+    private List<ProductVariantRequest> variants;
+
+    /**
+     * Only allow 2 variant at most
+     * Example: "Red" : {
+     *     "XXL" : {
+     *         "sku" : RX,
+     *         "price" : 120.00,
+     *         "quantity" : 5,
+     *     }
+     * }
+     */
+    private Map<String, List<Map<String, SkuRequest>>> skus;
 
 }

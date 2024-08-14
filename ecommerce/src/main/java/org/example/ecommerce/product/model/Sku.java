@@ -21,7 +21,7 @@ public class Sku {
     @Size(max = 36)
     @Builder.Default
     @Column(name = "uuid_sku")
-    private String uuidSku = Utils.getTSUuid();
+    private String uuidSku = Utils.getUuid();
     @Column(name = "uuid_product")
     @Size(max = 40)
     private String uuidProduct;
@@ -31,4 +31,15 @@ public class Sku {
     private double price;
     @Column(name = "quantity")
     private int quantity;
+
+    @Override
+    public String toString() {
+        return "Sku{" +
+                "uuidSku='" + uuidSku + '\'' +
+                ", uuidProduct='" + uuidProduct + '\'' +
+                ", sku='" + sku + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                '}';
+    }
 }

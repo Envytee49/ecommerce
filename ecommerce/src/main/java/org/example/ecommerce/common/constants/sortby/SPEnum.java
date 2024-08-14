@@ -1,5 +1,7 @@
 package org.example.ecommerce.common.constants.sortby;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
 
 /**

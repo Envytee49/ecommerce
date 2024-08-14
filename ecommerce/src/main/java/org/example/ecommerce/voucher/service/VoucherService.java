@@ -6,12 +6,12 @@ import org.example.ecommerce.voucher.dto.response.FSVoucherResponse;
 import org.example.ecommerce.voucher.dto.response.ShopVoucherResponse;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Map;
 
 public interface VoucherService {
     ShopVoucherResponse getShopVouchers(FetchVoucherRequest fetchVoucherRequest);
     void redeemVoucher(String uuidVoucher);
-    void updateVoucherUsage(List<String> uuidVouchers);
+    void updateVoucherUsage(Map<String, String> shopVouchers);
     boolean checkConstraintSatisfied(double minSpend,
                                      LocalDateTime validUntil,
                                      LocalDateTime validFrom,

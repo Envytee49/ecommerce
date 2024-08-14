@@ -2,11 +2,9 @@ package org.example.ecommerce.product.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.example.ecommerce.product.model.Product;
 import org.example.ecommerce.product.projections.ProductResponseProjection;
 
 @Getter
-@Builder
 public class ProductResponse {
     private String uuidProduct;
 
@@ -20,18 +18,20 @@ public class ProductResponse {
 
     private Double averageRating;
 
-    private Integer sold;
+    private Double sold;
 
-    public static ProductResponse from(ProductResponseProjection product) {
-        return ProductResponse.builder()
-                .averageRating(product.getAverageRating())
-                .sold(product.getSold())
-                .discount(product.getDiscount())
-                .priceAfterDiscount(product.getPrice() * (1 - product.getDiscount()))
-                .price(product.getPrice())
-                .title(product.getTitle())
-                .uuidProduct(product.getUuidProduct())
-                .build();
+    public ProductResponse(String uuidProduct,
+                           String title,
+                           Double price,
+                           Double discount,
+                           Double averageRating,
+                           Double sold) {
+        this.uuidProduct = uuidProduct;
+        this.title = title;
+        this.price = price;
+        this.discount = discount;
+        this.priceAfterDiscount = price * (1-discount);
+        this.averageRating = averageRating;
+        this.sold = sold;
     }
-
 }

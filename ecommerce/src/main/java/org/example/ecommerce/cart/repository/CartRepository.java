@@ -3,6 +3,7 @@ package org.example.ecommerce.cart.repository;
 import org.example.ecommerce.cart.model.CartItem;
 import org.example.ecommerce.cart.projection.CartItemProjection;
 import org.example.ecommerce.order.projection.InvoiceItemProjection;
+import org.example.ecommerce.order.projection.OrderItemStockProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -82,4 +83,21 @@ public interface CartRepository extends JpaRepository<CartItem, String> {
                                                     @Param("uuidCart") String uuidCart);
 
     CartItem findByUuidCartAndUuidSku(String uuidCart, String uuidSku);
+
+    @Query(value = "SELECT " +
+            "p.title as title, " +
+            "p.uuid_Product as uuid_Product, " +
+            "ci.uuid_Cart_Item as uuid_Cart_Item, " +
+            "ci.quantity as quantity, " +
+            "(SELECT GROUP_CONCAT(pvo.name SEPARATOR ', ')  " +
+            "FROM sku_product_variant_option spvo " +
+            "JOIN product_variant_option pvo ON spvo.uuid_product_variant_option = pvo.uuid_product_variant_option " +
+            "WHERE spvo.uuid_sku = ci.uuid_Sku " +
+            "GROUP BY spvo.uuid_sku) AS productVariantOptions, " +
+            "CASE WHEN ci.uuid_Sku IS NULL THEN p.quantity ELSE s.quantity END as stock " +
+            "FROM Cart_Item ci " +
+            "JOIN Product p ON p.uuid_Product = ci.uuid_Product " +
+            "LEFT JOIN Sku s ON s.uuid_Sku = ci.uuid_Sku " +
+            "WHERE ci.uuid_Cart_Item = :orderingItems", nativeQuery = true)
+    List<OrderItemStockProjection> findOrderingItemStock(List<String> orderingItems);
 }
